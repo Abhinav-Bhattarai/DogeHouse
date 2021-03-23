@@ -1,21 +1,62 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useState } from "react";
+import { enableScreens } from "react-native-screens";
+import AsyncStorage from "@react-native-community/async-storage";
+import axios from "axios";
+import LoadingPage from "./Components/UI/LoadingPage";
+import MainPage from "./Containers/MainPage";
+import LandingPage from "./Containers/LandingPage";
+enableScreens();
 
-export default function App() {
+const AuthenticationGuard: React.FC<{
+  status: boolean;
+  ChangeAuthentication: (status: boolean) => void;
+}> = ({ ChangeAuthentication, status }) => {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <>
+      {status === true ? (
+        <MainPage />
+      ) : (
+        <LandingPage ChangeAuthentication={ChangeAuthentication} />
+      )}
+    </>
+  );
+};
+
+function App() {
+  const [auth_status, SetAuthStatus] = useState<boolean | null>();
+
+  useEffect(() => {
+    const CheckAuthentication = async () => {
+      const Token = await AsyncStorage.getItem("auth-token");
+      const Username = await AsyncStorage.getItem("Username");
+      const UserID = await AsyncStorage.getItem("UserID");
+      if (Token && Username && UserID) {
+        const response = await axios.post("http://192.168.0.106:8000/check-auth", {Token});
+        if (JSON.stringify(response.data) !== JSON.stringify({ error: true })) {
+          SetAuthStatus(true);
+        } else {
+          SetAuthStatus(false);
+        }
+      } else {
+        SetAuthStatus(false);
+      }
+    };
+
+    CheckAuthentication();
+  }, []);
+
+  return (
+    <>
+      {auth_status === null || auth_status === undefined ? (
+        <LoadingPage />
+      ) : (
+        <AuthenticationGuard
+          status = {auth_status}
+          ChangeAuthentication = {(status: boolean) => SetAuthStatus(status) }
+        />
+      )}
+    </>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App;
