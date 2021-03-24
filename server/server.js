@@ -6,6 +6,7 @@ import sanitizer from 'express-sanitizer'
 import socket from 'socket.io';
 import http from 'http';
 import dotenv from 'dotenv';
+import MainGQLSchema from './Schema/MainSchema.js';
 dotenv.config();
 
 const app = express();
@@ -28,7 +29,7 @@ io.on('connection', socket => {
 
 // graphQL endpoints;
 app.use('/graphql', ExpressGrpahQL({
-    schema: '',
+    schema: MainGQLSchema,
     graphiql: true
 }));
 

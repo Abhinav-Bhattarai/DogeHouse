@@ -98,7 +98,7 @@ const LandingPage: React.FC<PROPS> = ({ ChangeAuthentication }) => {
       <Tabs.Navigator
         tabBarPosition="bottom"
         lazy={true}
-        backBehavior="initialRoute"
+        backBehavior='initialRoute'
         tabBarOptions={{
           indicatorStyle: { height: 2, backgroundColor: "#ff5B2D" },
           activeTintColor: "#ff5B2D",

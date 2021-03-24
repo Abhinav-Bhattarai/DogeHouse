@@ -15,6 +15,11 @@ const Schema = new mongoose.Schema({
     RegistryDate: {
         type: String,
         default: new Date(parseInt(Date.now())).toLocaleDateString()
+    },
+
+    DogeCount: {
+        type: Number,
+        default: 1000
     }
 
 });

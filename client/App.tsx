@@ -5,16 +5,26 @@ import axios from "axios";
 import LoadingPage from "./Components/UI/LoadingPage";
 import MainPage from "./Containers/MainPage";
 import LandingPage from "./Containers/LandingPage";
+import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 enableScreens();
 
+const client = new ApolloClient({
+  uri: "http://192.168.0.106:8000/graphql",
+  cache: new InMemoryCache(),
+});
+
 const AuthenticationGuard: React.FC<{
+  user_info: object;
   status: boolean;
   ChangeAuthentication: (status: boolean) => void;
-}> = ({ ChangeAuthentication, status }) => {
+}> = ({ ChangeAuthentication, status, user_info }) => {
   return (
     <>
       {status === true ? (
-        <MainPage />
+        <ApolloProvider client={client}>
+          {/* @ts-ignore */}
+          <MainPage userInfo={user_info} />
+        </ApolloProvider>
       ) : (
         <LandingPage ChangeAuthentication={ChangeAuthentication} />
       )}
@@ -24,6 +34,7 @@ const AuthenticationGuard: React.FC<{
 
 function App() {
   const [auth_status, SetAuthStatus] = useState<boolean | null>();
+  const [user_info, SetUserInfo] = useState<object | null>();
 
   useEffect(() => {
     const CheckAuthentication = async () => {
@@ -31,9 +42,13 @@ function App() {
       const Username = await AsyncStorage.getItem("Username");
       const UserID = await AsyncStorage.getItem("UserID");
       if (Token && Username && UserID) {
-        const response = await axios.post("http://192.168.0.106:8000/check-auth", {Token});
+        const response = await axios.post(
+          "http://192.168.0.106:8000/check-auth",
+          { Token }
+        );
         if (JSON.stringify(response.data) !== JSON.stringify({ error: true })) {
           SetAuthStatus(true);
+          SetUserInfo({ token: Token, Username, userID: UserID });
         } else {
           SetAuthStatus(false);
         }
@@ -47,12 +62,16 @@ function App() {
 
   return (
     <>
-      {auth_status === null || auth_status === undefined ? (
+      {auth_status === null ||
+      auth_status === undefined ||
+      user_info === null ||
+      user_info === undefined ? (
         <LoadingPage />
       ) : (
         <AuthenticationGuard
-          status = {auth_status}
-          ChangeAuthentication = {(status: boolean) => SetAuthStatus(status) }
+          user_info={user_info}
+          status={auth_status}
+          ChangeAuthentication={(status: boolean) => SetAuthStatus(status)}
         />
       )}
     </>
