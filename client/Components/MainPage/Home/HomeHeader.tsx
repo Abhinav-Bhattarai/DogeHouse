@@ -12,7 +12,7 @@ const HomeHeader = () => {
       <View style={{ flexDirection: "row", alignItems: "center" }}>
         <Image
           source={require("../../../assets/doge.jpg")}
-          style={{ width: 40, height: 40, borderRadius: 20 }}
+          style={{ width: 50, height: 50, borderRadius: 25, borderColor: '#36393F' }}
         />
         <Text
           style={{
