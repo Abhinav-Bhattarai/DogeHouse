@@ -4,16 +4,18 @@ import { createMaterialTopTabNavigator } from "@react-navigation/material-top-ta
 import { useQuery, gql } from "@apollo/client";
 import Context from "./Context";
 import LoadingPage from "../Components/UI/LoadingPage";
+import Profile from "../Components/MainPage/Profile/profile";
+import Home from "../Components/MainPage/Home/Home";
+import Trades from "../Components/MainPage/Trades/trades";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
 const Tabs = createMaterialTopTabNavigator();
 
 const UserInfo = gql`
-    query($id: String! auth_token: String!) {
-        UserInfo{id: $id, auth_token: !auth_token) {
-            _id,
-            Username,
-            DogeAvailable
-        }
+  query($id: String!, $token: String!) {
+    UserInfo(id: $id, auth_token: $token) {
+      _id
     }
+  }
 `;
 
 interface PROPS {
@@ -21,17 +23,19 @@ interface PROPS {
 }
 
 const MainPage: React.FC<PROPS> = (props) => {
-  const [doge_available, SSeDoge] = useState<0 | number>(0);
-
-  const { loading, error, data, refetch, previousData } = useQuery(UserInfo, {
-    variables: { id: props.userInfo.userID, auth_token: props.userInfo.token },
+  const [doge_available, SetDoge] = useState<0 | number>(0);
+  const { loading, error } = useQuery(UserInfo, {
+    variables: { id: props.userInfo.userID, token: props.userInfo.token },
     onCompleted: (res) => {
-      console.log(res);
     },
   });
 
-  if(loading === true) {
-      return <LoadingPage/>
+  if (loading === true) {
+    return <LoadingPage />;
+  }
+
+  if (error) {
+    return <LoadingPage />;
   }
 
   const NavigationComponent = () => {
@@ -47,17 +51,50 @@ const MainPage: React.FC<PROPS> = (props) => {
           showIcon: true,
           showLabel: false,
           iconStyle: {
-            height: 30,
-            width: 30,
+            height: 26,
+            width: 26,
           },
           tabStyle: {
             padding: 0,
+            backgroundColor: "#2F3136",
           },
-          activeTintColor: "",
-          inactiveTintColor: "",
+          activeTintColor: "#ff385c",
+          inactiveTintColor: "grey",
         }}
       >
-        <Tabs.Screen name="Profile">{() => <h1></h1>}</Tabs.Screen>
+        <Tabs.Screen
+          name="Home"
+          options={{
+            tabBarIcon: (status) => (
+              <AntDesign color={status.color} size={26} name="home" />
+            ),
+          }}
+        >
+          {() => <Home />}
+        </Tabs.Screen>
+
+        <Tabs.Screen
+          name="Trades"
+          options={{
+            tabBarIcon: (status) => (
+              <Ionicons name="analytics" size={26} color={status.color} />
+            ),
+          }}
+        >
+          {() => <Trades />}
+        </Tabs.Screen>
+
+        <Tabs.Screen
+          name="Profile"
+          options={{
+            tabBarIcon: (status) => (
+              <AntDesign color={status.color} size={26} name="profile" />
+            ),
+          }}
+        >
+          {() => <Profile />}
+        </Tabs.Screen>
+
       </Tabs.Navigator>
     );
   };

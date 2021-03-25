@@ -1,5 +1,7 @@
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
 const { GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLSchema } = require("graphql");
-import RegisterModel from "../Models/register-model";
+import RegisterModel from "../Models/register-model.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();

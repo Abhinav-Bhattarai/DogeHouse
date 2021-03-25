@@ -14,13 +14,13 @@ const client = new ApolloClient({
 });
 
 const AuthenticationGuard: React.FC<{
-  user_info: object;
+  user_info: object | null;
   status: boolean;
   ChangeAuthentication: (status: boolean) => void;
 }> = ({ ChangeAuthentication, status, user_info }) => {
   return (
     <>
-      {status === true ? (
+      {status === true && user_info ? (
         <ApolloProvider client={client}>
           {/* @ts-ignore */}
           <MainPage userInfo={user_info} />
@@ -33,11 +33,12 @@ const AuthenticationGuard: React.FC<{
 };
 
 function App() {
-  const [auth_status, SetAuthStatus] = useState<boolean | null>();
-  const [user_info, SetUserInfo] = useState<object | null>();
+  const [auth_status, SetAuthStatus] = useState<boolean | null>(null);
+  const [user_info, SetUserInfo] = useState<object | null>(null);
 
   useEffect(() => {
     const CheckAuthentication = async () => {
+      // await AsyncStorage.clear();
       const Token = await AsyncStorage.getItem("auth-token");
       const Username = await AsyncStorage.getItem("Username");
       const UserID = await AsyncStorage.getItem("UserID");
@@ -62,10 +63,7 @@ function App() {
 
   return (
     <>
-      {auth_status === null ||
-      auth_status === undefined ||
-      user_info === null ||
-      user_info === undefined ? (
+      {auth_status === null || user_info === undefined ? (
         <LoadingPage />
       ) : (
         <AuthenticationGuard

@@ -24,7 +24,7 @@ const HashPassword = (password, cb) => {
     })
 }
 
-const Register = async (Username, Password, Confirm, HashCode, Phone, callback) => {
+const Register = async (Username, Password, Confirm, callback) => {
     if (Username.length > 5 && Password === Confirm && Password.length > 7) {
         const number_regex = /[0-9]/;
         if (number_regex.exec(Password) !== null) {
@@ -34,8 +34,6 @@ const Register = async (Username, Password, Confirm, HashCode, Phone, callback) 
                     const Data = {
                         Username,
                         Password: hash,
-                        HashCode,
-                        Phone: parseInt(Phone),
                         RegistryDate: new Date(parseInt(Date.now())).toLocaleDateString
                     }
                     const RegistrationData = new RegisterModel(Data);
@@ -60,9 +58,7 @@ router.post('/', (req, res) => {
     const Username = req.body.Username;
     const Password = req.body.Password;
     const Confirm = req.body.Confirm;
-    const Phone = req.body.Phone
-    const HashCode = Math.floor((Math.random() * 100000));
-    Register(Username, Password, Confirm, HashCode, Phone, response => {
+    Register(Username, Password, Confirm, response => {
         return res.json(response)
     });
 });

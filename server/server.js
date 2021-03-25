@@ -1,11 +1,16 @@
 import express from 'express';
 import mongoose from 'mongoose';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
 const ExpressGrpahQL = require('express-graphql').graphqlHTTP;
 import bodyparser from 'body-parser';
 import sanitizer from 'express-sanitizer'
 import socket from 'socket.io';
 import http from 'http';
 import dotenv from 'dotenv';
+import LoginRoute from './Routes/login.js';
+import CheckAuthRoute from './Routes/check-jwt.js';
+import SignupRoute from './Routes/register.js';
 import MainGQLSchema from './Schema/MainSchema.js';
 dotenv.config();
 
@@ -34,6 +39,9 @@ app.use('/graphql', ExpressGrpahQL({
 }));
 
 // REST api exndpoints;
+app.use('/login', LoginRoute);
+app.use('/check-auth', CheckAuthRoute);
+app.use('/signup', SignupRoute);
 
 // mongoDB main connecion;
 mongoose.connect(process.env.MONGO_URI, {useUnifiedTopology: true, useNewUrlParser: true}).then(() => {
