@@ -20,6 +20,11 @@ const Schema = new mongoose.Schema({
     DogeCount: {
         type: Number,
         default: 1000
+    },
+
+    Stocks: {
+        type: [{stock_id: String, quantity: Number}],
+        default: []
     }
 
 });
