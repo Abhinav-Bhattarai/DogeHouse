@@ -34,15 +34,9 @@ const Schema = new mongoose.Schema({
     CurrentTradingValue: {
         type: Number,
         default: 10
-    },
-
-    Logo: {
-        type: String,
-        data: Buffer,
-        required: true
     }
 });
 
-const TickerModel = mongoose.Model('Ticker-Name', Schema);
+const TickerModel = mongoose.model('Ticker-Name', Schema);
 
 export default TickerModel;

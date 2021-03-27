@@ -46,7 +46,7 @@ const MainPage: React.FC<PROPS> = (props) => {
         tabBarOptions={{
           indicatorStyle: {
             height: 3,
-            backgroundColor: "",
+            backgroundColor: "#ff385c",
           },
           showIcon: true,
           showLabel: false,
