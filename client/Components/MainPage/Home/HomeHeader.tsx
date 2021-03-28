@@ -6,9 +6,6 @@ const { width } = Dimensions.get("window");
 const HomeHeader = () => {
   return (
     <View style={Styles.HeaderContainer}>
-      {/* <Text style={{fontWeight: 'bold', fontSize: 22, color: '#fff', marginHorizontal: 'auto'}}>
-                DogeHouse
-            </Text> */}
       <View style={{ flexDirection: "row", alignItems: "center" }}>
         <Image
           source={require("../../../assets/doge.jpg")}

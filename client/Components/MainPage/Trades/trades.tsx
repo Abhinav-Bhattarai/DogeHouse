@@ -1,60 +1,82 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, StatusBar, ActivityIndicator, FlatList } from "react-native";
-import { gql, useLazyQuery } from "@apollo/client";
+import {
+  View,
+  StyleSheet,
+  StatusBar,
+  ActivityIndicator,
+  FlatList,
+  TextInput
+} from "react-native";
+import { gql, useLazyQuery, NetworkStatus } from "@apollo/client";
 import TradeCard from "../trade-card";
 import LoadingPage from "../../UI/LoadingPage";
 
 const FetchAllShares = gql`
-    query($requestCount: Int!) {
-        Stocks(request_count: $requestCount) {
-            _id,
-            Name,
-            Ticker,
-            High,
-            Low,
-            Volume,
-            limit_reached,
-            CurrentTradingValue
-        }
+  query($requestCount: Int!) {
+    Stocks(request_count: $requestCount) {
+      data
+      limit_reached
     }
+  }
 `;
 
 const LoadingView = () => {
-    return (
-        <View style={{flex: 1}}>
-            <ActivityIndicator size='large' color='#fff'/>
-        </View>
-    )
+  return (
+    <View style={{ flex: 1, backgroundColor: '#36393F', alignItems: 'center', justifyContent: 'center' }}>
+      <ActivityIndicator size="large" color="#fff" />
+    </View>
+  );
+};
+
+interface SearchBarProps {
+  value: string;
+  onChange: (text: string) => void;
 }
 
+const SearchBar: React.FC<SearchBarProps> = (props) => {
+  return (
+    <TextInput
+      placeholder="Search here...."
+      onChangeText={(text: string) => props.onChange(text)}
+      style={Styles.TextInput}
+      value={props.value}
+      returnKeyType="done"
+      placeholderTextColor='grey'
+    />
+  );
+};
+
 export interface StocksContainer {
-  _id: string,
-  Name: string,
-  Ticker: string,
-  High: number,
-  Low: number,
-  Volume: number,
-  limit_reached?: boolean,
-  CurrentTradingValue: number
+  _id: string;
+  Name: string;
+  Ticker: string;
+  High: number;
+  Low: number;
+  Volume: number;
+  limit_reached?: boolean;
+  CurrentTradingValue: number;
 }
 
 const Trades = () => {
   const [request_count, SetRequestCount] = useState<number>(0);
-  const [stocks_container, SetStocksContainer] = useState<Array<StocksContainer> | null>(null);
+  const [
+    stocks_container,
+    SetStocksContainer,
+  ] = useState<Array<StocksContainer> | null>(null);
   const [api_limiter, SetApiLimiter] = useState<boolean>(false);
+  const [search_value, SetSearchValue] = useState<string>("");
   const [refresing, SetRefresh] = useState<boolean>(false);
-  const [FetchStocks, { loading, error }] = useLazyQuery(FetchAllShares, {
-      onCompleted: response => {
-        if (response.Stocks !== null) {
-          const { data, limit_reached } = response.Stocks;
-          SetStocksContainer(data);
-          limit_reached && SetApiLimiter(true);
-        }else{
-          
-        }
+  const [FetchStocks, { loading, error, networkStatus }] = useLazyQuery(FetchAllShares, {
+    onCompleted: (response) => {
+      if (response.Stocks !== null) {
+        const { data, limit_reached } = response.Stocks;
+        SetStocksContainer(JSON.parse(data));
+        limit_reached && SetApiLimiter(true);
       }
+      console.log(refresing);
+      refresing && SetRefresh(false);
+    },
   });
-
 
   const CallGQL = () => {
     FetchStocks({ variables: { requestCount: request_count } });
@@ -62,19 +84,19 @@ const Trades = () => {
 
   const RefreshHandler = () => {
     SetRefresh(true);
-    FetchStocks({ variables: { requestCount: 0 } });
+    FetchStocks();
     request_count > 0 && SetRequestCount(0);
     api_limiter === true && SetApiLimiter(false);
-  }
+  };
 
   useEffect(() => { CallGQL() }, []);
 
-  if(loading) {
-    return <LoadingView/>
+  if (loading && networkStatus !== NetworkStatus.refetch) {
+    return <LoadingView />;
   }
 
-  if(error && stocks_container === null) {
-    return <LoadingPage/>
+  if (error && stocks_container === null) {
+    return <LoadingPage />;
   }
 
   return (
@@ -82,11 +104,12 @@ const Trades = () => {
       <StatusBar hidden />
       <FlatList
         data={stocks_container}
-        keyExtractor= {(element) => element._id}
+        keyExtractor={element => element._id}
         refreshing={refresing}
         onRefresh={RefreshHandler}
-        renderItem={stock => {
-          return( 
+        onEndReached={CallGQL}
+        renderItem={(stock) => {
+          return (
             <TradeCard
               Name={stock.item.Name}
               _id={stock.item._id}
@@ -96,8 +119,15 @@ const Trades = () => {
               Volume={stock.item.Volume}
               CurrentTradingValue={stock.item.CurrentTradingValue}
             />
-          )
+          );
         }}
+        // contentContainerStyle={Styles.FlatList}
+        ListHeaderComponent={() => (
+          <SearchBar
+            value={search_value}
+            onChange={(text: string) => SetSearchValue(text)}
+          />
+        )}
       />
     </View>
   );
@@ -107,6 +137,21 @@ const Styles = StyleSheet.create({
   MainContainer: {
     flex: 1,
     backgroundColor: "#36393F",
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+
+  FlatList: {
+    flex: 1,
+  },
+
+  TextInput: {
+    backgroundColor: '#202225',
+    borderRadius: 6,
+    paddingVertical: 12,
+    paddingHorizontal: '3%',
+    marginVertical: 5,
+    color: '#fff'
   },
 });
 

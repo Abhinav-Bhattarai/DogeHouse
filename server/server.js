@@ -12,10 +12,11 @@ import LoginRoute from './Routes/login.js';
 import CheckAuthRoute from './Routes/check-jwt.js';
 import SignupRoute from './Routes/register.js';
 import MainGQLSchema from './Schema/MainSchema.js';
+import TickerAdminRoute from './Routes/ticker-admin.js';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 8000;
+const PORT = 8000;
 const server = http.createServer(app);
 const io = socket(server);
 
@@ -42,6 +43,7 @@ app.use('/graphql', ExpressGrpahQL({
 app.use('/login', LoginRoute);
 app.use('/check-auth', CheckAuthRoute);
 app.use('/signup', SignupRoute);
+app.use('/ticker', TickerAdminRoute);
 
 // mongoDB main connecion;
 mongoose.connect(process.env.MONGO_URI, {useUnifiedTopology: true, useNewUrlParser: true}).then(() => {

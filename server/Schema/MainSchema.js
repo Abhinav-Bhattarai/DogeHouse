@@ -36,7 +36,16 @@ const TickerSchema = new GraphQLObjectType({
       Volume: {type: GraphQLInt},
       OutstandingStocks: {type: GraphQLInt},
       CurrentTradingValue: {type: GraphQLInt},
-      limit_reached: {type: GraphQLBoolean}
+    }
+  }
+});
+
+const DummyStockSchema = new GraphQLObjectType({
+  name: 'DummyStockSchema',
+  fields: () => {
+    return {
+      data: {type: GraphQLString},
+      limit_reached: {type: GraphQLBoolean},
     }
   }
 })
@@ -74,17 +83,16 @@ const RootQuery = new GraphQLObjectType({
     },
 
     Stocks: {
-      type: new GraphQLList(TickerSchema),
+      type: DummyStockSchema,
       args: {request_count: {type: GraphQLInt}},
       resolve: async(_, args) => {
         const { request_count } = args;
         const response = await TickerModel.find({}).skip(request_count).limit(request_count * 10);
-        console.log(response);
         if(response.length !== 0) {
           if(response.length === 10){
-            return {data: response, limit_reached: false}
+            return {data: JSON.stringify(response), limit_reached: false}
           }
-          return {data: response, limit_reached: true}
+          return {data: JSON.stringify(response), limit_reached: true}
         }
       }
     },
@@ -98,7 +106,6 @@ const RootQuery = new GraphQLObjectType({
         if (response !== null) {
           return response
         }
-        return
       }
     }
 
