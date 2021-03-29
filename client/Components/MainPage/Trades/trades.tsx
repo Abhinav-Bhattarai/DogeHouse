@@ -7,14 +7,23 @@ import {
   FlatList,
   TextInput
 } from "react-native";
-import { gql, useLazyQuery, NetworkStatus } from "@apollo/client";
+import { gql, useLazyQuery } from "@apollo/client";
 import TradeCard from "../trade-card";
 import LoadingPage from "../../UI/LoadingPage";
 
 const FetchAllShares = gql`
   query($requestCount: Int!) {
     Stocks(request_count: $requestCount) {
-      data
+      data {
+        _id
+        Name
+        Ticker
+        High
+        Low
+        Volume
+        CurrentTradingValue
+        OutstandingStocks
+      }
       limit_reached
     }
   }
@@ -30,17 +39,16 @@ const LoadingView = () => {
 
 interface SearchBarProps {
   value: string;
-  onChange: (text: string) => void;
+  Change: (text: string) => void;
 }
 
 const SearchBar: React.FC<SearchBarProps> = (props) => {
   return (
     <TextInput
-      placeholder="Search here...."
-      onChangeText={(text: string) => props.onChange(text)}
+      placeholder="Search stocks here...."
+      onChangeText={(text: string) => props.Change(text)}
       style={Styles.TextInput}
       value={props.value}
-      returnKeyType="done"
       placeholderTextColor='grey'
     />
   );
@@ -66,38 +74,43 @@ const Trades = () => {
   const [api_limiter, SetApiLimiter] = useState<boolean>(false);
   const [search_value, SetSearchValue] = useState<string>("");
   const [refresing, SetRefresh] = useState<boolean>(false);
-  const [FetchStocks, { loading, error, networkStatus }] = useLazyQuery(FetchAllShares, {
+  const [FetchStocks, { loading, error }] = useLazyQuery(FetchAllShares, {
     onCompleted: (response) => {
       if (response.Stocks !== null) {
         const { data, limit_reached } = response.Stocks;
-        SetStocksContainer(JSON.parse(data));
+        SetStocksContainer(data);
         limit_reached && SetApiLimiter(true);
+        SetRequestCount(request_count + 1)
       }
-      console.log(refresing);
       refresing && SetRefresh(false);
     },
   });
+
 
   const CallGQL = () => {
     FetchStocks({ variables: { requestCount: request_count } });
   };
 
+  const ChangeText = (text: string): void => {
+    SetSearchValue(text);
+  }
+
   const RefreshHandler = () => {
     SetRefresh(true);
-    FetchStocks();
     request_count > 0 && SetRequestCount(0);
+    FetchStocks({ variables: { requestCount: request_count } });
     api_limiter === true && SetApiLimiter(false);
   };
 
   useEffect(() => { CallGQL() }, []);
 
-  if (loading && networkStatus !== NetworkStatus.refetch) {
+  if (loading || stocks_container === null) {
     return <LoadingView />;
   }
 
-  if (error && stocks_container === null) {
+  if (error) {
     return <LoadingPage />;
-  }
+  };
 
   return (
     <View style={Styles.MainContainer}>
@@ -125,7 +138,7 @@ const Trades = () => {
         ListHeaderComponent={() => (
           <SearchBar
             value={search_value}
-            onChange={(text: string) => SetSearchValue(text)}
+            Change={(text: string) => ChangeText(text)}
           />
         )}
       />
@@ -146,13 +159,14 @@ const Styles = StyleSheet.create({
   },
 
   TextInput: {
-    backgroundColor: '#202225',
-    borderRadius: 6,
+    backgroundColor: '#2F3136',//'#202225',
+    borderRadius: 15,
     paddingVertical: 12,
-    paddingHorizontal: '3%',
-    marginVertical: 5,
-    color: '#fff'
+    paddingHorizontal: '6%',
+    marginVertical: 10,
+    color: '#fff',
+    width: '100%'
   },
 });
 
-export default Trades;
+export default React.memo(Trades);

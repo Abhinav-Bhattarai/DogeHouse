@@ -33,13 +33,18 @@ const MapItems = {
   },
 
   Python: {
-    logo: <FontAwesome5 name="python" size={40} color="#F72C1F" />,
-    color: "#F72C1F",
+    logo: <FontAwesome5 name="python" size={40} color="#3775A8" />,
+    color: "#3775A8",
   },
 
   Java: {
-    logo: <FontAwesome5 name="java" size={40} color="#F72C1F" />,
-    color: "#F72C1F",
+    logo: <FontAwesome5 name="java" size={40} color="#0370B7" />,
+    color: "#0370B7",
+  },
+
+  PHP: {
+    logo: <FontAwesome5 name="php" size={40} color="#7377AD" />,
+    color: "#7377AD",
   },
 
 };

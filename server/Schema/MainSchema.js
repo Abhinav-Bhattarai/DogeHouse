@@ -44,11 +44,11 @@ const DummyStockSchema = new GraphQLObjectType({
   name: 'DummyStockSchema',
   fields: () => {
     return {
-      data: {type: GraphQLString},
+      data: {type: new GraphQLList(TickerSchema)},
       limit_reached: {type: GraphQLBoolean},
     }
   }
-})
+});
 
 const RootQuery = new GraphQLObjectType({
   name: "RootQuery",
@@ -87,12 +87,12 @@ const RootQuery = new GraphQLObjectType({
       args: {request_count: {type: GraphQLInt}},
       resolve: async(_, args) => {
         const { request_count } = args;
-        const response = await TickerModel.find({}).skip(request_count).limit(request_count * 10);
+        const response = await TickerModel.find({}).skip(request_count * 10).limit(10);
         if(response.length !== 0) {
           if(response.length === 10){
-            return {data: JSON.stringify(response), limit_reached: false}
+            return {data: response, limit_reached: false}
           }
-          return {data: JSON.stringify(response), limit_reached: true}
+          return {data: response, limit_reached: true}
         }
       }
     },
