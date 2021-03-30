@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { useQuery, gql } from "@apollo/client";
 import Context from "./Context";
 import LoadingPage from "../Components/UI/LoadingPage";
+import Home from '../Components/MainPage/Home/home';
 import Profile from "../Components/MainPage/Profile/profile";
-import Home from "../Components/MainPage/Home/Home";
 import Trades from "../Components/MainPage/Trades/trades";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
 const Tabs = createMaterialTopTabNavigator();
 
 const UserInfo = gql`
@@ -26,8 +26,7 @@ const MainPage: React.FC<PROPS> = (props) => {
   const [doge_available, SetDoge] = useState<0 | number>(0);
   const { loading, error } = useQuery(UserInfo, {
     variables: { id: props.userInfo.userID, token: props.userInfo.token },
-    onCompleted: (res) => {
-    },
+    onCompleted: (res) => {},
   });
 
   if (loading === true) {
@@ -51,8 +50,8 @@ const MainPage: React.FC<PROPS> = (props) => {
           showIcon: true,
           showLabel: false,
           iconStyle: {
-            height: 26,
-            width: 26,
+            height: 28,
+            width: 28,
           },
           tabStyle: {
             padding: 0,
@@ -63,38 +62,35 @@ const MainPage: React.FC<PROPS> = (props) => {
         }}
       >
         <Tabs.Screen
-          name="Home"
-          options={{
-            tabBarIcon: (status) => (
-              <AntDesign color={status.color} size={26} name="home" />
-            ),
-          }}
-        >
-          {() => <Home />}
-        </Tabs.Screen>
-
-        <Tabs.Screen
-          name="Trades"
-          options={{
-            tabBarIcon: (status) => (
-              <Ionicons name="analytics" size={26} color={status.color} />
-            ),
-          }}
-        >
-          {() => <Trades />}
-        </Tabs.Screen>
-
-        <Tabs.Screen
           name="Profile"
           options={{
             tabBarIcon: (status) => (
-              <AntDesign color={status.color} size={26} name="profile" />
+              <AntDesign color={status.color} size={28} name="profile" />
             ),
           }}
         >
           {() => <Profile />}
         </Tabs.Screen>
-
+        <Tabs.Screen
+          name="Trades"
+          options={{
+            tabBarIcon: (status) => (
+              <MaterialCommunityIcons name="graph-outline" size={31} color={status.color} />
+            ),
+          }}
+        >
+          {() => <Trades />}
+        </Tabs.Screen>
+        <Tabs.Screen
+          name="Home"
+          options={{
+            tabBarIcon: (status) => (
+              <AntDesign color={status.color} size={28} name="home" />
+            ),
+          }}
+        >
+          {() => <Home />}
+        </Tabs.Screen>
       </Tabs.Navigator>
     );
   };

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   StyleSheet,
@@ -8,7 +8,7 @@ import {
   TextInput,
   Dimensions,
 } from "react-native";
-import { gql, useLazyQuery } from "@apollo/client";
+import { gql, useLazyQuery, useQuery } from "@apollo/client";
 import TradeCard from "../trade-card";
 import LoadingPage from "../../UI/LoadingPage";
 import { AntDesign } from "@expo/vector-icons";
@@ -77,44 +77,58 @@ export interface StocksContainer {
 
 const Trades = () => {
   const [request_count, SetRequestCount] = useState<number>(0);
-  const [
-    stocks_container,
-    SetStocksContainer,
-  ] = useState<Array<StocksContainer> | null>(null);
+  const [stocks_container, SetStocksContainer] = useState<Array<StocksContainer> | null>(null);
+  const [suggestion, SetSuggestion] = useState<Array<StocksContainer> | null>(null);
   const [api_limiter, SetApiLimiter] = useState<boolean>(false);
   const [search_value, SetSearchValue] = useState<string>("");
   const [refresing, SetRefresh] = useState<boolean>(false);
-  const [FetchStocks, { loading, error }] = useLazyQuery(FetchAllShares, {
+  const [FetchStocks] = useLazyQuery(FetchAllShares, {
     onCompleted: (response) => {
-      if (response.Stocks !== null) {
-        const { data, limit_reached } = response.Stocks;
-        SetStocksContainer(data);
-        limit_reached && SetApiLimiter(true);
-        SetRequestCount(request_count + 1);
-      }
-      refresing && SetRefresh(false);
+      FetchCompleteHandler(response);
     },
   });
+  const { loading, error, refetch, data } = useQuery(FetchAllShares, {
+    variables: {requestCount: 0},
+    onCompleted: (response) => {
+      FetchCompleteHandler(response);
+    },
+    onError: (err) => console.log(err)
+  });
 
+  const FetchCompleteHandler = (response: any) => {
+    if (response.Stocks !== null) {
+      const { data, limit_reached } = response.Stocks;
+      SetStocksContainer(data);
+      limit_reached && SetApiLimiter(true);
+      SetRequestCount(request_count + 1);
+    }
+    refresing && SetRefresh(false);
+  }
 
   const CallGQL = () => {
-    FetchStocks({ variables: { requestCount: request_count } });
+    api_limiter === false && FetchStocks({ variables: { requestCount: request_count } });
   };
 
   const ChangeText = (text: string): void => {
+    const regex = new RegExp(`^${text}`, 'gi');
+    if(stocks_container !== null) {
+      const dummy = [...stocks_container];
+      const suggestion_container = [];
+      for (let i of dummy) {
+        regex.exec(i.Name) && suggestion_container.push(i);
+        regex.test(i.Name)
+      }
+      SetSuggestion(suggestion_container);
+    }
     SetSearchValue(text);
   };
 
   const RefreshHandler = () => {
+    refetch();
     SetRefresh(true);
     request_count > 0 && SetRequestCount(0);
-    FetchStocks({ variables: { requestCount: request_count } });
     api_limiter === true && SetApiLimiter(false);
   };
-
-  useEffect(() => {
-    CallGQL();
-  }, []);
 
   if (loading || stocks_container === null) {
     return <LoadingView />;
@@ -142,7 +156,7 @@ const Trades = () => {
         />
       </View>
       <FlatList
-        data={stocks_container}
+        data={(search_value.length < 1) ? stocks_container : suggestion}
         keyExtractor={(element) => element._id}
         refreshing={refresing}
         onRefresh={RefreshHandler}

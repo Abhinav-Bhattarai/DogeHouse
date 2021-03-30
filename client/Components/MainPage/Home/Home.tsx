@@ -1,12 +1,10 @@
 import React from 'react';
 import { View, StyleSheet, StatusBar } from 'react-native';
-import HomeHeader from './HomeHeader';
 
-const Home = () => {
+const Profile = () => {
     return (
         <View style={Styles.MainContainer}>
             <StatusBar hidden/>
-            <HomeHeader/>
         </View>
     )
 };
@@ -14,9 +12,8 @@ const Home = () => {
 const Styles = StyleSheet.create({
     MainContainer: {
         flex: 1,
-        backgroundColor: '#36393F',
-        position: 'relative'
+        backgroundColor: '#36393F'
     }
 })
 
-export default Home;
+export default Profile;

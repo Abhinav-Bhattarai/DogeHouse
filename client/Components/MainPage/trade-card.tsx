@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { StyleSheet, View, Dimensions, Text } from "react-native";
 import { StocksContainer } from "./Trades/trades";
 import MapItems from "../mapper";
@@ -61,11 +61,7 @@ const CardGraph = () => {
           datasets: [
             {
               data: [
-                Math.random() * 100,
-                Math.random() * 100,
-                Math.random() * 100,
-                Math.random() * 100,
-                Math.random() * 100,
+                10, 20, 30, 40, 50
               ],
             },
           ],

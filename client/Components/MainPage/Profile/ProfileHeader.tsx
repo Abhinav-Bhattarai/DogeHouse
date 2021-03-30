@@ -3,7 +3,7 @@ import { StyleSheet, View, Dimensions, Text, Image } from "react-native";
 
 const { width } = Dimensions.get("window");
 
-const HomeHeader = () => {
+const ProfileHeader = () => {
   return (
     <View style={Styles.HeaderContainer}>
       <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -39,4 +39,4 @@ const Styles = StyleSheet.create({
   },
 });
 
-export default HomeHeader;
+export default ProfileHeader;
