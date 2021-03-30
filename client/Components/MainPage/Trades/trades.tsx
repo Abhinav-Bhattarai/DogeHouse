@@ -32,7 +32,7 @@ const FetchAllShares = gql`
   }
 `;
 
-const LoadingView = () => {
+export const LoadingView = () => {
   return (
     <View
       style={{

@@ -129,7 +129,7 @@ const RootQuery = new GraphQLObjectType({
           return JSON.stringify(response.Portfolio);
         }
       }
-
+    }
   },
 });
 
