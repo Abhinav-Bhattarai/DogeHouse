@@ -5,11 +5,14 @@ import {
   StatusBar,
   ActivityIndicator,
   FlatList,
-  TextInput
+  TextInput,
+  Dimensions,
 } from "react-native";
 import { gql, useLazyQuery } from "@apollo/client";
 import TradeCard from "../trade-card";
 import LoadingPage from "../../UI/LoadingPage";
+import { AntDesign } from "@expo/vector-icons";
+const { width } = Dimensions.get("window");
 
 const FetchAllShares = gql`
   query($requestCount: Int!) {
@@ -31,7 +34,14 @@ const FetchAllShares = gql`
 
 const LoadingView = () => {
   return (
-    <View style={{ flex: 1, backgroundColor: '#36393F', alignItems: 'center', justifyContent: 'center' }}>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: "#36393F",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
       <ActivityIndicator size="large" color="#fff" />
     </View>
   );
@@ -48,8 +58,8 @@ const SearchBar: React.FC<SearchBarProps> = (props) => {
       placeholder="Search stocks here...."
       onChangeText={(text: string) => props.Change(text)}
       style={Styles.TextInput}
-      value={props.value}
-      placeholderTextColor='grey'
+      defaultValue={props.value}
+      placeholderTextColor="grey"
     />
   );
 };
@@ -80,7 +90,7 @@ const Trades = () => {
         const { data, limit_reached } = response.Stocks;
         SetStocksContainer(data);
         limit_reached && SetApiLimiter(true);
-        SetRequestCount(request_count + 1)
+        SetRequestCount(request_count + 1);
       }
       refresing && SetRefresh(false);
     },
@@ -93,7 +103,7 @@ const Trades = () => {
 
   const ChangeText = (text: string): void => {
     SetSearchValue(text);
-  }
+  };
 
   const RefreshHandler = () => {
     SetRefresh(true);
@@ -102,7 +112,9 @@ const Trades = () => {
     api_limiter === true && SetApiLimiter(false);
   };
 
-  useEffect(() => { CallGQL() }, []);
+  useEffect(() => {
+    CallGQL();
+  }, []);
 
   if (loading || stocks_container === null) {
     return <LoadingView />;
@@ -110,14 +122,28 @@ const Trades = () => {
 
   if (error) {
     return <LoadingPage />;
-  };
+  }
 
   return (
     <View style={Styles.MainContainer}>
       <StatusBar hidden />
+      <View
+        style={{ width: width, marginVertical: 10 }}
+      >
+        <SearchBar
+          value={search_value}
+          Change={(text: string) => ChangeText(text)}
+        />
+        <AntDesign
+          color="grey"
+          size={26}
+          name="search1"
+          style={{ position: "absolute", top: 11, right: "5%" }}
+        />
+      </View>
       <FlatList
         data={stocks_container}
-        keyExtractor={element => element._id}
+        keyExtractor={(element) => element._id}
         refreshing={refresing}
         onRefresh={RefreshHandler}
         onEndReached={CallGQL}
@@ -134,13 +160,6 @@ const Trades = () => {
             />
           );
         }}
-        // contentContainerStyle={Styles.FlatList}
-        ListHeaderComponent={() => (
-          <SearchBar
-            value={search_value}
-            Change={(text: string) => ChangeText(text)}
-          />
-        )}
       />
     </View>
   );
@@ -150,8 +169,8 @@ const Styles = StyleSheet.create({
   MainContainer: {
     flex: 1,
     backgroundColor: "#36393F",
-    alignItems: 'center',
-    justifyContent: 'center'
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   FlatList: {
@@ -159,13 +178,12 @@ const Styles = StyleSheet.create({
   },
 
   TextInput: {
-    backgroundColor: '#2F3136',//'#202225',
+    backgroundColor: "#2F3136", //'#202225',
     borderRadius: 15,
     paddingVertical: 12,
-    paddingHorizontal: '6%',
-    marginVertical: 10,
-    color: '#fff',
-    width: '100%'
+    paddingHorizontal: "6%",
+    color: "#fff",
+    width: "100%",
   },
 });
 
