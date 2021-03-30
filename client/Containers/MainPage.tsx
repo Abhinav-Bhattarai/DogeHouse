@@ -26,7 +26,9 @@ const MainPage: React.FC<PROPS> = (props) => {
   const [doge_available, SetDoge] = useState<0 | number>(0);
   const { loading, error } = useQuery(UserInfo, {
     variables: { id: props.userInfo.userID, token: props.userInfo.token },
-    onCompleted: (res) => {},
+    onCompleted: (res) => {
+      console.log(res);
+    },
   });
 
   if (loading === true) {
@@ -41,6 +43,7 @@ const MainPage: React.FC<PROPS> = (props) => {
     return (
       <Tabs.Navigator
         lazy={true}
+        initialRouteName='Trades'
         tabBarPosition="bottom"
         tabBarOptions={{
           indicatorStyle: {

@@ -5,6 +5,7 @@ import RegisterModel from "../Models/register-model.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import TickerModel from '../Models/Ticker-model.js';
+import PortfolioModel from '../Models/Portfolio.js';
 dotenv.config();
 
 const UserSchema = new GraphQLObjectType({
@@ -39,6 +40,15 @@ const TickerSchema = new GraphQLObjectType({
     }
   }
 });
+
+const PortfolioSchema = new GraphQLObjectType({
+  name: 'PortfolioSchema',
+  fields: () => {
+    return {
+      PortfolioSchema: {type: GraphQLString}
+    }
+  }
+})
 
 const DummyStockSchema = new GraphQLObjectType({
   name: 'DummyStockSchema',
@@ -107,7 +117,18 @@ const RootQuery = new GraphQLObjectType({
           return response
         }
       }
-    }
+    },
+
+    PorfolioInfo: {
+      type: PortfolioSchema,
+      args: {UserID: {type: GraphQLString}},
+      resolve: async(_, args) => {
+        const { UserID } = args;
+        const response = await PortfolioModel.find({ UserID });
+        if (response !== null) {
+          return JSON.stringify(response.Portfolio);
+        }
+      }
 
   },
 });

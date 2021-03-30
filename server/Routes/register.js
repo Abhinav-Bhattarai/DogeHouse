@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import RegisterModel from '../Models/register-model.js';
 import dotenv from 'dotenv';
+import PortfolioModel from '../Models/Portfolio.js';
 dotenv.config();
 const router = express.Router();
 
@@ -39,6 +40,8 @@ const Register = async (Username, Password, Confirm, callback) => {
                     const RegistrationData = new RegisterModel(Data);
                     RegistrationData.save().then(user => {
                         GetAuthToken(Data, token => {
+                            const PortfolioData = new PortfolioModel({UserID: user._id})
+                            await PortfolioData.save();
                             return callback({token, UserID: user._id })
                         })
                     });
