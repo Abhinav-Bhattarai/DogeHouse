@@ -4,7 +4,7 @@ import {
   StyleSheet,
   StatusBar,
   ActivityIndicator,
-  FlatList,
+  Vibration,
   TextInput,
   Dimensions,
   VirtualizedList,
@@ -91,6 +91,7 @@ const Trades = () => {
   const { loading, error, refetch, data } = useQuery(FetchAllShares, {
     variables: {requestCount: 0},
     onCompleted: (response) => {
+      Vibration.vibrate(100);
       FetchCompleteHandler(response);
     },
     onError: (err) => console.log(err)
@@ -145,6 +146,20 @@ const Trades = () => {
     return data[index];
   }
 
+  const RenderItem = (stock: any) => {
+    return (
+      <TradeCard
+        Name={stock.item.Name}
+        _id={stock.item._id}
+        Ticker={stock.item.Ticker}
+        High={stock.item.High}
+        Low={stock.item.Low}
+        Volume={stock.item.Volume}
+        CurrentTradingValue={stock.item.CurrentTradingValue}
+      />
+    );
+  }
+
   return (
     <View style={Styles.MainContainer}>
       <StatusBar hidden />
@@ -163,24 +178,13 @@ const Trades = () => {
         />
       </View>
       <VirtualizedList
+        initialNumToRender={1}
         data={(search_value.length < 1) ? stocks_container : suggestion}
         keyExtractor={(item) => item._id}
         refreshing={refresing}
         onRefresh={RefreshHandler}
         onEndReached={CallGQL}
-        renderItem={(stock) => {
-          return (
-            <TradeCard
-              Name={stock.item.Name}
-              _id={stock.item._id}
-              Ticker={stock.item.Ticker}
-              High={stock.item.High}
-              Low={stock.item.Low}
-              Volume={stock.item.Volume}
-              CurrentTradingValue={stock.item.CurrentTradingValue}
-            />
-          );
-        }}
+        renderItem={RenderItem}
         getItemCount={ItemCount}
         getItem={GetItem}
       />

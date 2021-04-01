@@ -44,6 +44,7 @@ const MainPage: React.FC<PROPS> = (props) => {
         lazy={true}
         initialRouteName='Trades'
         tabBarPosition="bottom"
+        sceneContainerStyle={{backgroundColor: '#36393F', flex: 1}}
         tabBarOptions={{
           indicatorStyle: {
             height: 3,
