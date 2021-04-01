@@ -78,7 +78,6 @@ const LandingPage: React.FC<PROPS> = ({ ChangeAuthentication }) => {
           Confirm: confirm_signup,
         };
         const response = await axios.post("http://192.168.0.106:8000/signup", context);
-        console.log(response);
         const error = { authentication_failed: true };
         const UsernameTaken = { username_already_taken: true };
         if (JSON.stringify(response.data) !== JSON.stringify(error)) {

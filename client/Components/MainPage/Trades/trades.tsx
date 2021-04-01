@@ -7,6 +7,7 @@ import {
   FlatList,
   TextInput,
   Dimensions,
+  VirtualizedList,
 } from "react-native";
 import { gql, useLazyQuery, useQuery } from "@apollo/client";
 import TradeCard from "../trade-card";
@@ -138,6 +139,12 @@ const Trades = () => {
     return <LoadingPage />;
   }
 
+  const ItemCount = () => stocks_container !== null ? stocks_container.length : 0
+
+  const GetItem = (data: any, index: number) => {
+    return data[index];
+  }
+
   return (
     <View style={Styles.MainContainer}>
       <StatusBar hidden />
@@ -155,9 +162,9 @@ const Trades = () => {
           style={{ position: "absolute", top: 11, right: "5%" }}
         />
       </View>
-      <FlatList
+      <VirtualizedList
         data={(search_value.length < 1) ? stocks_container : suggestion}
-        keyExtractor={(element) => element._id}
+        keyExtractor={(item) => item._id}
         refreshing={refresing}
         onRefresh={RefreshHandler}
         onEndReached={CallGQL}
@@ -174,6 +181,8 @@ const Trades = () => {
             />
           );
         }}
+        getItemCount={ItemCount}
+        getItem={GetItem}
       />
     </View>
   );

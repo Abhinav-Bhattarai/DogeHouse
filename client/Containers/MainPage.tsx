@@ -13,7 +13,7 @@ const Tabs = createMaterialTopTabNavigator();
 const UserInfo = gql`
   query($id: String!, $token: String!) {
     UserInfo(id: $id, auth_token: $token) {
-      _id
+      Dogecount
     }
   }
 `;
@@ -23,11 +23,10 @@ interface PROPS {
 }
 
 const MainPage: React.FC<PROPS> = (props) => {
-  const [doge_available, SetDoge] = useState<0 | number>(0);
+  const [doge_available, SetDoge] = useState<number>(0);
   const { loading, error } = useQuery(UserInfo, {
     variables: { id: props.userInfo.userID, token: props.userInfo.token },
     onCompleted: (res) => {
-      console.log(res);
     },
   });
 

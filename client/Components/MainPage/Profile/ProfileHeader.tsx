@@ -28,13 +28,10 @@ const ProfileHeader = () => {
 
 const Styles = StyleSheet.create({
   HeaderContainer: {
-    position: "absolute",
     width: width,
     paddingVertical: 10,
     alignItems: "center",
     flexDirection: "row",
-    top: 0,
-    left: 0,
     justifyContent: "flex-end",
   },
 });

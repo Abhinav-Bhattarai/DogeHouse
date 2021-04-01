@@ -12,15 +12,7 @@ const UserSchema = new GraphQLObjectType({
   name: "UserSchema",
   fields: () => {
     return {
-      _id: {
-        type: GraphQLString,
-      },
-      Username: {
-        type: GraphQLString,
-      },
-      DogeAvailable: {
-        type: GraphQLInt,
-      },
+      Dogecount: {type: GraphQLInt}
     };
   },
 });
@@ -45,7 +37,7 @@ const PortfolioSchema = new GraphQLObjectType({
   name: 'PortfolioSchema',
   fields: () => {
     return {
-      PortfolioSchema: {type: GraphQLString}
+      Portfolio: {type: GraphQLString}
     }
   }
 })
@@ -80,11 +72,7 @@ const RootQuery = new GraphQLObjectType({
           jwt.verify(auth_token, process.env.JWT_AUTH_TOKEN, (err, data) => {
             if (!err) {
               if (data.Username === response.Username) {
-                const data = {
-                  Username: response.Username,
-                  DogeAvailable: response.DogeAvailable,
-                };
-                return data;
+                return {Dogecount: response.DogeCount};
               }
             }
           });
@@ -126,7 +114,7 @@ const RootQuery = new GraphQLObjectType({
         const { UserID } = args;
         const response = await PortfolioModel.find({ UserID });
         if (response !== null) {
-          return JSON.stringify(response.Portfolio);
+          return {Portfolio: JSON.stringify(response[0].Portfolio)}
         }
       }
     }

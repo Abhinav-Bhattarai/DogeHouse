@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { StyleSheet, View, Dimensions, Text } from "react-native";
 import { StocksContainer } from "./Trades/trades";
 import MapItems from "../mapper";
@@ -10,7 +10,7 @@ interface CardProps {
   name: string;
 }
 
-const CardHeader: React.FC<CardProps> = (props) => {
+export const CardHeader: React.FC<CardProps> = (props) => {
   return (
     <View
       style={{
@@ -61,7 +61,7 @@ const CardGraph = () => {
           datasets: [
             {
               data: [
-                10, 20, 30, 40, 50
+                30, 20, 25, 40, 43, 45, 90, 50, 80, 79, 43, 100, 30, 50, 40, 10, 100
               ],
             },
           ],
@@ -100,7 +100,7 @@ const CardGraph = () => {
 
 const TradeCard: React.FC<StocksContainer> = (props) => {
   // @ts-ignore
-  const StockPick = MapItems[props.Name];
+  const [StockPick, _] = useState<any>(MapItems[props.Name]);
   return (
     <View style={Styles.MainContainer}>
       <CardHeader color={StockPick.color} name={props.Name}>

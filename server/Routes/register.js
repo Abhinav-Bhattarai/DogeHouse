@@ -41,8 +41,9 @@ const Register = async (Username, Password, Confirm, callback) => {
                     RegistrationData.save().then(user => {
                         GetAuthToken(Data, token => {
                             const PortfolioData = new PortfolioModel({UserID: user._id})
-                            await PortfolioData.save();
-                            return callback({token, UserID: user._id })
+                            PortfolioData.save().then(() => {
+                                return callback({token, UserID: user._id })
+                            });
                         })
                     });
                 });
@@ -65,5 +66,11 @@ router.post('/', (req, res) => {
         return res.json(response)
     });
 });
+
+router.delete('/', (req, res) => {
+    RegisterModel.remove().then(() => {
+        return res.json({deleted: true});
+    });
+})
 
 export default router;
