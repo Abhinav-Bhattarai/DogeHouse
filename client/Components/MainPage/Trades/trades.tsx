@@ -15,6 +15,27 @@ import LoadingPage from "../../UI/LoadingPage";
 import { AntDesign } from "@expo/vector-icons";
 const { width } = Dimensions.get("window");
 
+// interfaces;
+export interface StocksContainer {
+  _id: string;
+  Name: string;
+  Ticker: string;
+  High: number;
+  Low: number;
+  Volume: number;
+  limit_reached?: boolean;
+  CurrentTradingValue: number;
+  DataSet: Array<number>;
+};
+
+interface SearchBarProps {
+  value: string;
+  Change: (text: string) => void;
+}
+
+
+// ApolloClient gql request;
+
 const FetchAllShares = gql`
   query($requestCount: Int!) {
     Stocks(request_count: $requestCount) {
@@ -27,12 +48,16 @@ const FetchAllShares = gql`
         Volume
         CurrentTradingValue
         OutstandingStocks
+        DataSet
       }
       limit_reached
     }
   }
 `;
 
+export const StockInfo = (info: Array<StocksContainer>) => info
+
+// Sub-Intra Components;
 export const LoadingView = () => {
   return (
     <View
@@ -48,11 +73,6 @@ export const LoadingView = () => {
   );
 };
 
-interface SearchBarProps {
-  value: string;
-  Change: (text: string) => void;
-}
-
 const SearchBar: React.FC<SearchBarProps> = (props) => {
   return (
     <TextInput
@@ -65,17 +85,6 @@ const SearchBar: React.FC<SearchBarProps> = (props) => {
   );
 };
 
-export interface StocksContainer {
-  _id: string;
-  Name: string;
-  Ticker: string;
-  High: number;
-  Low: number;
-  Volume: number;
-  limit_reached?: boolean;
-  CurrentTradingValue: number;
-}
-
 const Trades = () => {
   const [request_count, SetRequestCount] = useState<number>(0);
   const [stocks_container, SetStocksContainer] = useState<Array<StocksContainer> | null>(null);
@@ -86,15 +95,16 @@ const Trades = () => {
   const [FetchStocks] = useLazyQuery(FetchAllShares, {
     onCompleted: (response) => {
       FetchCompleteHandler(response);
+      StockInfo(response.Stocks);
     },
   });
-  const { loading, error, refetch, data } = useQuery(FetchAllShares, {
+  const { loading, error, refetch } = useQuery(FetchAllShares, {
     variables: {requestCount: 0},
     onCompleted: (response) => {
-      Vibration.vibrate(100);
+      Vibration.vibrate(50);
+      const { data } = response.Stocks;
       FetchCompleteHandler(response);
     },
-    onError: (err) => console.log(err)
   });
 
   const FetchCompleteHandler = (response: any) => {
@@ -142,9 +152,7 @@ const Trades = () => {
 
   const ItemCount = () => search_value.length < 1 ? stocks_container.length : suggestion?.length
 
-  const GetItem = (data: any, index: number) => {
-    return data[index];
-  }
+  const GetItem = (data: any, index: number) => data[index];
 
   const RenderItem = (stock: any) => {
     return (
@@ -156,6 +164,7 @@ const Trades = () => {
         Low={stock.item.Low}
         Volume={stock.item.Volume}
         CurrentTradingValue={stock.item.CurrentTradingValue}
+        DataSet={stock.item.DataSet}
       />
     );
   }

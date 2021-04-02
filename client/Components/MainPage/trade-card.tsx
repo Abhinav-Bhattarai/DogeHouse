@@ -84,7 +84,6 @@ const CardGraph = () => {
             r: "3",
             strokeWidth: "1",
             stroke: "#36393F",
-            onPress: () => console.log("pressed"),
           },
         }}
         bezier
@@ -100,7 +99,8 @@ const CardGraph = () => {
 
 const TradeCard: React.FC<StocksContainer> = (props) => {
   // @ts-ignore
-  const [StockPick, _] = useState<any>(MapItems[props.Name]);
+  const [StockPick, _] = useState<any>(MapItems[props.Name.toLowerCase()]);
+
   return (
     <View style={Styles.MainContainer}>
       <CardHeader color={StockPick.color} name={props.Name}>

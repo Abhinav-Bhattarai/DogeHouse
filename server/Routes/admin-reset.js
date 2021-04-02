@@ -6,7 +6,7 @@ const router = express.Router();
 const ModifyData = data => {
     const newData = [];
     data.forEach(ticker => {
-        const dummy = {...ticker};
+        const dummy = {...ticker._doc};
         ticker.High = dummy.CurrentTradingValue + dummy.CurrentTradingValue * 0.1;
         ticker.Low = dummy.CurrentTradingValue - dummy.CurrentTradingValue * 0.1;
         ticker.DataSet = [dummy.CurrentTradingValue];

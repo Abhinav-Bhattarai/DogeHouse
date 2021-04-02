@@ -14,6 +14,7 @@ import SignupRoute from './Routes/register.js';
 import MainGQLSchema from './Schema/MainSchema.js';
 import TickerAdminRoute from './Routes/ticker-admin.js';
 import AdminResetRoute from './Routes/admin-reset.js';
+import TestRoute from './Routes/test.js';
 dotenv.config();
 
 const app = express();
@@ -46,6 +47,7 @@ app.use('/check-auth', CheckAuthRoute);
 app.use('/signup', SignupRoute);
 app.use('/ticker', TickerAdminRoute);
 app.use('/reset', AdminResetRoute);
+app.use('/test', TestRoute)
 
 // mongoDB main connecion;
 mongoose.connect(process.env.MONGO_URI, {useUnifiedTopology: true, useNewUrlParser: true}).then(() => {

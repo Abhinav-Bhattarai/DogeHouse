@@ -37,8 +37,8 @@ const Schema = new mongoose.Schema({
     },
 
     DataSet: {
-        type: [Number],
-        default: [10]
+        type: String,
+        default: "[10]"
     }
 });
 

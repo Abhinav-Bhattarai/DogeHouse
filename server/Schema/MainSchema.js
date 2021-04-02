@@ -29,7 +29,7 @@ const TickerSchema = new GraphQLObjectType({
       Volume: {type: GraphQLInt},
       OutstandingStocks: {type: GraphQLInt},
       CurrentTradingValue: {type: GraphQLInt},
-      DataSet: {type: GraphQLNonNull}
+      DataSet: {type: GraphQLString}
     }
   }
 });
