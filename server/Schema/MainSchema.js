@@ -1,6 +1,6 @@
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
-const { GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLSchema, GraphQLList, GraphQLBoolean } = require("graphql");
+const { GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLSchema, GraphQLList, GraphQLBoolean, GraphQLNonNull } = require("graphql");
 import RegisterModel from "../Models/register-model.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
@@ -29,6 +29,7 @@ const TickerSchema = new GraphQLObjectType({
       Volume: {type: GraphQLInt},
       OutstandingStocks: {type: GraphQLInt},
       CurrentTradingValue: {type: GraphQLInt},
+      DataSet: {type: GraphQLNonNull}
     }
   }
 });

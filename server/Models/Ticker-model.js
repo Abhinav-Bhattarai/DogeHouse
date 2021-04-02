@@ -28,12 +28,17 @@ const Schema = new mongoose.Schema({
 
     OutstandingStocks: {
         type: Number,
-        default: 2000000
+        default: 50000
     },
 
     CurrentTradingValue: {
         type: Number,
         default: 10
+    },
+
+    DataSet: {
+        type: [Number],
+        default: [10]
     }
 });
 

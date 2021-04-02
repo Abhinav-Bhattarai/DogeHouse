@@ -140,7 +140,7 @@ const Trades = () => {
     return <LoadingPage />;
   }
 
-  const ItemCount = () => stocks_container !== null ? stocks_container.length : 0
+  const ItemCount = () => search_value.length < 1 ? stocks_container.length : suggestion?.length
 
   const GetItem = (data: any, index: number) => {
     return data[index];
@@ -185,6 +185,7 @@ const Trades = () => {
         onRefresh={RefreshHandler}
         onEndReached={CallGQL}
         renderItem={RenderItem}
+        // @ts-ignore
         getItemCount={ItemCount}
         getItem={GetItem}
       />

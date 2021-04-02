@@ -26,6 +26,7 @@ const HashPassword = (password, cb) => {
 }
 
 const Register = async (Username, Password, Confirm, callback) => {
+    
     if (Username.length > 5 && Password === Confirm && Password.length > 7) {
         const number_regex = /[0-9]/;
         if (number_regex.exec(Password) !== null) {
