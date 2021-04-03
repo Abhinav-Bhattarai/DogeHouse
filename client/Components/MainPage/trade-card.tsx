@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { StyleSheet, View, Dimensions, Text } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Dimensions,
+  Text,
+  TouchableOpacity,
+} from "react-native";
 import { StocksContainer } from "./Trades/trades";
 import MapItems from "../mapper";
 import { LineChart } from "react-native-chart-kit";
@@ -37,15 +43,25 @@ export const CardHeader: React.FC<CardProps> = (props) => {
   );
 };
 
-const CardFooter: React.FC<{ name: string; value: number }> = ({name, value}) => {
+const CardFooter: React.FC<{ name: string; value: number }> = ({
+  name,
+  value,
+}) => {
   return (
     <View style={Styles.CardFooterContainer}>
-      <View style={{flexDirection: 'row', alignItems: 'center'}}>
+      <View style={{ flexDirection: "row", alignItems: "center" }}>
         <Text style={{ fontWeight: "bold", fontSize: 14, color: "grey" }}>
-          { name } :
+          {name} :
         </Text>
-        <Text style={{ fontWeight: "bold", fontSize: 15, color: "#90ee90", marginLeft: '4%' }}>
-          { value }
+        <Text
+          style={{
+            fontWeight: "bold",
+            fontSize: 15,
+            color: "#90ee90",
+            marginLeft: "4%",
+          }}
+        >
+          {value}
         </Text>
       </View>
     </View>
@@ -54,15 +70,19 @@ const CardFooter: React.FC<{ name: string; value: number }> = ({name, value}) =>
 
 const CardGraph = () => {
   return (
-    <View style={{ alignItems: "center", justifyContent: "center", marginBottom: 10 }}>
+    <View
+      style={{
+        alignItems: "center",
+        justifyContent: "center",
+        marginBottom: 10,
+      }}
+    >
       <LineChart
         data={{
           labels: ["12:00", "1:00", "2:00", "3:00", "4:00"],
           datasets: [
             {
-              data: [
-                30, 20, 40, 43, 45, 90, 50, 80, 79
-              ],
+              data: [30, 20, 40, 43, 45, 90, 50, 80, 79],
             },
           ],
         }}
@@ -102,15 +122,23 @@ const TradeCard: React.FC<StocksContainer> = (props) => {
   const [StockPick, _] = useState<any>(MapItems[props.Name.toLowerCase()]);
 
   return (
-    <View style={Styles.MainContainer}>
+    <TouchableOpacity
+      // @ts-ignore 
+      onPress={() => props.ClickStockCard(props.Name, StockPick.color)}
+      style={Styles.MainContainer}
+      activeOpacity={0.9}
+    >
       <CardHeader color={StockPick.color} name={props.Name}>
         {StockPick.logo}
       </CardHeader>
       <CardGraph />
-      <CardFooter name={'Last Traded Price'} value={props.CurrentTradingValue}/>
-      <CardFooter name={'High'} value={props.High}/>
-      <CardFooter name={'Low'} value={props.Low}/>
-    </View>
+      <CardFooter
+        name={"Last Traded Price"}
+        value={props.CurrentTradingValue}
+      />
+      <CardFooter name={"High"} value={props.High} />
+      <CardFooter name={"Low"} value={props.Low} />
+    </TouchableOpacity>
   );
 };
 
@@ -125,7 +153,7 @@ const Styles = StyleSheet.create({
 
   CardFooterContainer: {
     marginVertical: 5,
-    paddingHorizontal: '5%'
+    paddingHorizontal: "5%",
   },
 });
 

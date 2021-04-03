@@ -1,20 +1,12 @@
 import React, { useState } from "react";
-import {
-  View,
-  StyleSheet,
-  StatusBar,
-  ActivityIndicator,
-  Vibration,
-  TextInput,
-  Dimensions,
-  VirtualizedList,
-} from "react-native";
+import { View, ActivityIndicator, Vibration } from "react-native";
 import { gql, useLazyQuery, useQuery } from "@apollo/client";
-import TradeCard from "../trade-card";
 import LoadingPage from "../../UI/LoadingPage";
-import { AntDesign } from "@expo/vector-icons";
-const { width } = Dimensions.get("window");
+import { createStackNavigator } from "@react-navigation/stack";
+import TradeList from "./TradeList";
+import StockDetails from "./StockDetails";
 
+const Stack = createStackNavigator();
 // interfaces;
 export interface StocksContainer {
   _id: string;
@@ -26,13 +18,8 @@ export interface StocksContainer {
   limit_reached?: boolean;
   CurrentTradingValue: number;
   DataSet: Array<number>;
-};
-
-interface SearchBarProps {
-  value: string;
-  Change: (text: string) => void;
+  ClickStockCard?: (name: string, color: string) => void;
 }
-
 
 // ApolloClient gql request;
 
@@ -55,7 +42,11 @@ const FetchAllShares = gql`
   }
 `;
 
-export const StockInfo = (info: Array<StocksContainer>) => info
+export let StockInfo: Array<StocksContainer> | null = null;
+
+const StockInfoHandler = (info: Array<StocksContainer>): void => {
+  StockInfo = info;
+};
 
 // Sub-Intra Components;
 export const LoadingView = () => {
@@ -73,36 +64,28 @@ export const LoadingView = () => {
   );
 };
 
-const SearchBar: React.FC<SearchBarProps> = (props) => {
-  return (
-    <TextInput
-      placeholder="Search stocks here...."
-      onChangeText={(text: string) => props.Change(text)}
-      style={Styles.TextInput}
-      defaultValue={props.value}
-      placeholderTextColor="grey"
-    />
-  );
-};
-
 const Trades = () => {
   const [request_count, SetRequestCount] = useState<number>(0);
-  const [stocks_container, SetStocksContainer] = useState<Array<StocksContainer> | null>(null);
-  const [suggestion, SetSuggestion] = useState<Array<StocksContainer> | null>(null);
+  const [
+    stocks_container,
+    SetStocksContainer,
+  ] = useState<Array<StocksContainer> | null>(null);
+  const [suggestion, SetSuggestion] = useState<Array<StocksContainer> | null>(
+    null
+  );
   const [api_limiter, SetApiLimiter] = useState<boolean>(false);
   const [search_value, SetSearchValue] = useState<string>("");
   const [refresing, SetRefresh] = useState<boolean>(false);
   const [FetchStocks] = useLazyQuery(FetchAllShares, {
     onCompleted: (response) => {
       FetchCompleteHandler(response);
-      StockInfo(response.Stocks);
     },
   });
   const { loading, error, refetch } = useQuery(FetchAllShares, {
-    variables: {requestCount: 0},
+    variables: { requestCount: 0 },
     onCompleted: (response) => {
       Vibration.vibrate(50);
-      const { data } = response.Stocks;
+      StockInfoHandler(response.Stocks.data);
       FetchCompleteHandler(response);
     },
   });
@@ -115,20 +98,21 @@ const Trades = () => {
       SetRequestCount(request_count + 1);
     }
     refresing && SetRefresh(false);
-  }
+  };
 
   const CallGQL = () => {
-    api_limiter === false && FetchStocks({ variables: { requestCount: request_count } });
+    api_limiter === false &&
+      FetchStocks({ variables: { requestCount: request_count } });
   };
 
   const ChangeText = (text: string): void => {
-    const regex = new RegExp(`^${text}`, 'gi');
-    if(stocks_container !== null) {
+    const regex = new RegExp(`^${text}`, "gi");
+    if (stocks_container !== null) {
       const dummy = [...stocks_container];
       const suggestion_container = [];
       for (let i of dummy) {
         regex.exec(i.Name) && suggestion_container.push(i);
-        regex.test(i.Name)
+        regex.test(i.Name);
       }
       SetSuggestion(suggestion_container);
     }
@@ -150,78 +134,40 @@ const Trades = () => {
     return <LoadingPage />;
   }
 
-  const ItemCount = () => search_value.length < 1 ? stocks_container.length : suggestion?.length
-
-  const GetItem = (data: any, index: number) => data[index];
-
-  const RenderItem = (stock: any) => {
-    return (
-      <TradeCard
-        Name={stock.item.Name}
-        _id={stock.item._id}
-        Ticker={stock.item.Ticker}
-        High={stock.item.High}
-        Low={stock.item.Low}
-        Volume={stock.item.Volume}
-        CurrentTradingValue={stock.item.CurrentTradingValue}
-        DataSet={stock.item.DataSet}
-      />
-    );
-  }
-
   return (
-    <View style={Styles.MainContainer}>
-      <StatusBar hidden />
-      <View
-        style={{ width: width, marginVertical: 10 }}
+    <Stack.Navigator>
+      <Stack.Screen name="TradeList" options={{ headerShown: false }}>
+        {(navigation) => (
+          <TradeList
+            search_value={search_value}
+            ChangeText={(text: string) => ChangeText(text)}
+            refreshing={refresing}
+            RefreshHandler={RefreshHandler}
+            CallGQL={CallGQL}
+            suggestion={suggestion}
+            stocks_container={stocks_container}
+            navigation={navigation}
+          />
+        )}
+      </Stack.Screen>
+
+      <Stack.Screen
+        name="StockDetails"
+        options={{
+          headerShown: true,
+          headerStyle: {
+            backgroundColor: "#2F3136",
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontSize: 16
+          }
+        }}
       >
-        <SearchBar
-          value={search_value}
-          Change={(text: string) => ChangeText(text)}
-        />
-        <AntDesign
-          color="grey"
-          size={26}
-          name="search1"
-          style={{ position: "absolute", top: 11, right: "5%" }}
-        />
-      </View>
-      <VirtualizedList
-        initialNumToRender={1}
-        data={(search_value.length < 1) ? stocks_container : suggestion}
-        keyExtractor={(item) => item._id}
-        refreshing={refresing}
-        onRefresh={RefreshHandler}
-        onEndReached={CallGQL}
-        renderItem={RenderItem}
-        // @ts-ignore
-        getItemCount={ItemCount}
-        getItem={GetItem}
-      />
-    </View>
+        {(navigation) => <StockDetails navigation={navigation}/>}
+      </Stack.Screen>
+    </Stack.Navigator>
   );
 };
-
-const Styles = StyleSheet.create({
-  MainContainer: {
-    flex: 1,
-    backgroundColor: "#36393F",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  FlatList: {
-    flex: 1,
-  },
-
-  TextInput: {
-    backgroundColor: "#2F3136", //'#202225',
-    borderRadius: 15,
-    paddingVertical: 12,
-    paddingHorizontal: "6%",
-    color: "#fff",
-    width: "100%",
-  },
-});
 
 export default React.memo(Trades);
