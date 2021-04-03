@@ -12,7 +12,7 @@ const UserSchema = new GraphQLObjectType({
   name: "UserSchema",
   fields: () => {
     return {
-      Dogecount: {type: GraphQLInt}
+      DogeCount: {type: GraphQLInt}
     };
   },
 });
@@ -70,13 +70,12 @@ const RootQuery = new GraphQLObjectType({
         const { id, auth_token } = args;
         const response = await RegisterModel.findById(id);
         if (response !== null) {
-          jwt.verify(auth_token, process.env.JWT_AUTH_TOKEN, (err, data) => {
-            if (!err) {
-              if (data.Username === response.Username) {
-                return {Dogecount: response.DogeCount};
-              }
+          const data = await jwt.verify(auth_token, process.env.JWT_AUTH_TOKEN);
+          if(data) {
+            if(data.Username === response.Username) {
+              return { DogeCount: response.DogeCount }
             }
-          });
+          }
         }
       },
     },

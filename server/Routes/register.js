@@ -36,7 +36,7 @@ const Register = async (Username, Password, Confirm, callback) => {
                     const Data = {
                         Username,
                         Password: hash,
-                        RegistryDate: new Date(parseInt(Date.now())).toLocaleDateString
+                        RegistryDate: new Date(parseInt(Date.now())).toLocaleDateString()
                     }
                     const RegistrationData = new RegisterModel(Data);
                     RegistrationData.save().then(user => {

@@ -8,12 +8,13 @@ import Home from '../Components/MainPage/Home/home';
 import Profile from "../Components/MainPage/Profile/profile";
 import Trades from "../Components/MainPage/Trades/trades";
 import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
+import Settings from '../Components/MainPage/Settings/settings';
 const Tabs = createMaterialTopTabNavigator();
 
 const UserInfo = gql`
   query($id: String!, $token: String!) {
     UserInfo(id: $id, auth_token: $token) {
-      Dogecount
+      DogeCount
     }
   }
 `;
@@ -27,6 +28,7 @@ const MainPage: React.FC<PROPS> = (props) => {
   const { loading, error } = useQuery(UserInfo, {
     variables: { id: props.userInfo.userID, token: props.userInfo.token },
     onCompleted: (res) => {
+      console.log(res);
     },
   });
 
@@ -74,6 +76,7 @@ const MainPage: React.FC<PROPS> = (props) => {
         >
           {() => <Profile />}
         </Tabs.Screen>
+
         <Tabs.Screen
           name="Trades"
           options={{
@@ -84,6 +87,7 @@ const MainPage: React.FC<PROPS> = (props) => {
         >
           {() => <Trades />}
         </Tabs.Screen>
+
         <Tabs.Screen
           name="Home"
           options={{
@@ -94,6 +98,18 @@ const MainPage: React.FC<PROPS> = (props) => {
         >
           {() => <Home />}
         </Tabs.Screen>
+
+        <Tabs.Screen
+          name="Settings"
+          options={{
+            tabBarIcon: (status) => (
+              <AntDesign color={status.color} size={28} name="setting" />
+            ),
+          }}
+        >
+          {() => <Settings/>}
+        </Tabs.Screen>
+
       </Tabs.Navigator>
     );
   };
