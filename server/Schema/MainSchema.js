@@ -1,56 +1,63 @@
-import { createRequire } from 'module';
+import { createRequire } from "module";
 const require = createRequire(import.meta.url);
-const { GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLSchema, GraphQLList, GraphQLBoolean, GraphQLNonNull } = require("graphql");
+const {
+  GraphQLObjectType,
+  GraphQLString,
+  GraphQLInt,
+  GraphQLSchema,
+  GraphQLList,
+  GraphQLBoolean,
+} = require("graphql");
 import RegisterModel from "../Models/register-model.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import TickerModel from '../Models/Ticker-model.js';
-import PortfolioModel from '../Models/Portfolio.js';
+import TickerModel from "../Models/Ticker-model.js";
+import PortfolioModel from "../Models/Portfolio.js";
 dotenv.config();
 
 const UserSchema = new GraphQLObjectType({
   name: "UserSchema",
   fields: () => {
     return {
-      DogeCount: {type: GraphQLInt}
+      DogeCount: { type: GraphQLInt },
     };
   },
 });
 
 const TickerSchema = new GraphQLObjectType({
-  name: 'TickerSchema',
+  name: "TickerSchema",
   fields: () => {
     return {
-      _id: {type: GraphQLString},
-      Name: {type: GraphQLString},
-      Ticker: {type: GraphQLString},
-      High: {type: GraphQLInt},
-      Low: {type: GraphQLInt},
-      Volume: {type: GraphQLInt},
-      OutstandingStocks: {type: GraphQLInt},
-      CurrentTradingValue: {type: GraphQLInt},
-      DataSet: {type: GraphQLString}
-    }
-  }
+      _id: { type: GraphQLString },
+      Name: { type: GraphQLString },
+      Ticker: { type: GraphQLString },
+      High: { type: GraphQLInt },
+      Low: { type: GraphQLInt },
+      Volume: { type: GraphQLInt },
+      OutstandingStocks: { type: GraphQLInt },
+      CurrentTradingValue: { type: GraphQLInt },
+      DataSet: { type: GraphQLString },
+    };
+  },
 });
 
 const PortfolioSchema = new GraphQLObjectType({
-  name: 'PortfolioSchema',
+  name: "PortfolioSchema",
   fields: () => {
     return {
-      Portfolio: {type: GraphQLString}
-    }
-  }
-})
+      Portfolio: { type: GraphQLString },
+    };
+  },
+});
 
 const DummyStockSchema = new GraphQLObjectType({
-  name: 'DummyStockSchema',
+  name: "DummyStockSchema",
   fields: () => {
     return {
-      data: {type: new GraphQLList(TickerSchema)},
-      limit_reached: {type: GraphQLBoolean},
-    }
-  }
+      data: { type: new GraphQLList(TickerSchema) },
+      limit_reached: { type: GraphQLBoolean },
+    };
+  },
 });
 
 const RootQuery = new GraphQLObjectType({
@@ -71,9 +78,9 @@ const RootQuery = new GraphQLObjectType({
         const response = await RegisterModel.findById(id);
         if (response !== null) {
           const data = await jwt.verify(auth_token, process.env.JWT_AUTH_TOKEN);
-          if(data) {
-            if(data.Username === response.Username) {
-              return { DogeCount: response.DogeCount }
+          if (data) {
+            if (data.Username === response.Username) {
+              return { DogeCount: response.DogeCount };
             }
           }
         }
@@ -82,47 +89,49 @@ const RootQuery = new GraphQLObjectType({
 
     Stocks: {
       type: DummyStockSchema,
-      args: {request_count: {type: GraphQLInt}},
-      resolve: async(_, args) => {
+      args: { request_count: { type: GraphQLInt } },
+      resolve: async (_, args) => {
         const { request_count } = args;
-        const response = await TickerModel.find({}).skip(request_count * 10).limit(10);
-        if(response.length !== 0) {
-          if(response.length === 10){
-            return {data: response, limit_reached: false}
+        const response = await TickerModel.find({})
+          .skip(request_count * 10)
+          .limit(10);
+        if (response.length !== 0) {
+          if (response.length === 10) {
+            return { data: response, limit_reached: false };
           }
-          return {data: response, limit_reached: true}
+          return { data: response, limit_reached: true };
         }
-      }
+      },
     },
-    
+
     ShareInfo: {
       type: TickerSchema,
-      args: {id: {type: GraphQLString}},
-      resolve: async(_, args) => {
-        const {id} = args;
+      args: { id: { type: GraphQLString } },
+      resolve: async (_, args) => {
+        const { id } = args;
         const response = await TickerModel.findById(id);
         if (response !== null) {
-          return response
+          return response;
         }
-      }
+      },
     },
 
     PorfolioInfo: {
       type: PortfolioSchema,
-      args: {UserID: {type: GraphQLString}},
-      resolve: async(_, args) => {
+      args: { UserID: { type: GraphQLString } },
+      resolve: async (_, args) => {
         const { UserID } = args;
         const response = await PortfolioModel.find({ UserID });
         if (response !== null) {
-          return {Portfolio: JSON.stringify(response[0].Portfolio)}
+          return { Portfolio: JSON.stringify(response[0].Portfolio) };
         }
-      }
-    }
+      },
+    },
   },
 });
 
 const MainGQLSchema = new GraphQLSchema({
-    query: RootQuery
+  query: RootQuery,
 });
 
 export default MainGQLSchema;

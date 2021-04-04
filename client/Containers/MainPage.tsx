@@ -28,7 +28,8 @@ const MainPage: React.FC<PROPS> = (props) => {
   const { loading, error } = useQuery(UserInfo, {
     variables: { id: props.userInfo.userID, token: props.userInfo.token },
     onCompleted: (res) => {
-      console.log(res);
+      const { DogeCount } = res.UserInfo;
+      SetDoge(DogeCount);
     },
   });
 
@@ -122,6 +123,7 @@ const MainPage: React.FC<PROPS> = (props) => {
           userID: props.userInfo.userID,
           auth_token: props.userInfo.token,
           username: props.userInfo.Username,
+          dogeCount: doge_available
         }}
       >
         {inner_props.children}
@@ -139,3 +141,4 @@ const MainPage: React.FC<PROPS> = (props) => {
 };
 
 export default MainPage;
+ 

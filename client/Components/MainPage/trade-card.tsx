@@ -68,7 +68,7 @@ const CardFooter: React.FC<{ name: string; value: number }> = ({
   );
 };
 
-const CardGraph = () => {
+export const CardGraph = () => {
   return (
     <View
       style={{

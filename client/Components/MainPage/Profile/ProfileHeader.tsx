@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useContext } from "react";
 import { StyleSheet, View, Dimensions, Text, Image } from "react-native";
+import Context from "../../../Containers/Context";
 
 const { width } = Dimensions.get("window");
 
 const ProfileHeader = () => {
+  const context = useContext(Context);
   return (
     <View style={Styles.HeaderContainer}>
       <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -19,7 +21,7 @@ const ProfileHeader = () => {
             marginLeft: "6%"
           }}
         >
-          1000
+          {context.dogeCount}
         </Text>
       </View>
     </View>

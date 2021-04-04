@@ -84,7 +84,7 @@ const Trades = () => {
   const { loading, error, refetch } = useQuery(FetchAllShares, {
     variables: { requestCount: 0 },
     onCompleted: (response) => {
-      Vibration.vibrate(50);
+      Vibration.vibrate(25)
       StockInfoHandler(response.Stocks.data);
       FetchCompleteHandler(response);
     },
@@ -160,7 +160,8 @@ const Trades = () => {
           },
           headerTintColor: '#fff',
           headerTitleStyle: {
-            fontSize: 16
+            fontSize: 20,
+            fontWeight: 'bold'
           }
         }}
       >
