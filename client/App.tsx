@@ -9,7 +9,7 @@ import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 enableScreens();
 
 const client = new ApolloClient({
-  uri: "http://192.168.1.143:8000/graphql",
+  uri: "http://192.168.0.104:8000/graphql",
   cache: new InMemoryCache(),
 });
 
@@ -44,7 +44,7 @@ function App() {
       const UserID = await AsyncStorage.getItem("UserID");
       if (Token && Username && UserID) {
         const response = await axios.post(
-          "http://192.168.1.143:8000/check-auth",
+          "http://192.168.0.104:8000/check-auth",
           { Token }
         );
         if (JSON.stringify(response.data) !== JSON.stringify({ error: true })) {

@@ -18,7 +18,7 @@ export interface StocksContainer {
   limit_reached?: boolean;
   CurrentTradingValue: number;
   DataSet: Array<number>;
-  ClickStockCard?: (name: string, color: string) => void;
+  ClickStockCard?: (name: string, color: string, id: string) => void;
 }
 
 // ApolloClient gql request;

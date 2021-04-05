@@ -14,7 +14,9 @@ const { width, height } = Dimensions.get("window");
 interface CardProps {
   color: string;
   name: string;
-}
+};
+
+export const dummy_dataSet = [34, 37, 45, 50, 40, 45, 46, 43, 44, 41, 41, 41, 41, 43, 42, 42, 42, 42, 43, 44, 45, 46];
 
 export const CardHeader: React.FC<CardProps> = (props) => {
   return (
@@ -82,7 +84,7 @@ export const CardGraph = () => {
           labels: ["12:00", "1:00", "2:00", "3:00", "4:00"],
           datasets: [
             {
-              data: [30, 20, 40, 43, 45, 90],
+              data: dummy_dataSet,
             },
           ],
         }}
@@ -101,8 +103,8 @@ export const CardGraph = () => {
             borderRadius: 5,
           },
           propsForDots: {
-            r: "3",
-            strokeWidth: "1",
+            r: "0",
+            strokeWidth: "0",
             stroke: "#36393F",
           },
         }}
@@ -124,7 +126,7 @@ const TradeCard: React.FC<StocksContainer> = (props) => {
   return (
     <TouchableOpacity
       // @ts-ignore 
-      onPress={() => props.ClickStockCard(props.Name, StockPick.color)}
+      onPress={() => props.ClickStockCard(props.Name, StockPick.color, props._id)}
       style={Styles.MainContainer}
       activeOpacity={0.9}
     >

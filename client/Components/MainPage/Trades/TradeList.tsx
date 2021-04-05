@@ -36,8 +36,8 @@ const SearchBar: React.FC<SearchBarProps> = (props) => {
 
 const TradeList: React.FC<Props> = props => {
 
-    const ClickStockCardHandler = (name: string, color: string): void => {
-        props.navigation.navigation.navigate('StockDetails', { name, color })
+    const ClickStockCardHandler = (name: string, color: string, id: string): void => {
+        props.navigation.navigation.navigate('StockDetails', { name, color, id })
     }
 
     const RenderItem = (stock: any) => {
@@ -51,7 +51,7 @@ const TradeList: React.FC<Props> = props => {
           Volume={stock.item.Volume}
           CurrentTradingValue={stock.item.CurrentTradingValue}
           DataSet={stock.item.DataSet}
-          ClickStockCard={(name: string, color: string) => ClickStockCardHandler(name, color)}
+          ClickStockCard={(name: string, color: string, id: string) => ClickStockCardHandler(name, color, id)}
         />
       );
     };

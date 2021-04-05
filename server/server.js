@@ -32,6 +32,15 @@ app.use(sanitizer());
 io.on('connection', socket => {
     socket.on('disconnect', () => {
         console.log('user Disconnected');
+    });
+
+    socket.on('join-room', id => {
+        socket.join(id);
+        console.log(id);
+    });
+
+    socket.on('new-trade', (room_id, value) => {
+        socket.broadcast.to(room_id).emit(value);
     })
 });
 
