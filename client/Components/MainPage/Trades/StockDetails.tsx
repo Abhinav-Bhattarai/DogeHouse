@@ -4,8 +4,8 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, View, Dimensions, ActivityIndicator } from "react-native";
 import DetailsMapper from "../../details-mapper";
 import { LineChart } from "react-native-chart-kit";
-import socket from 'socket.io-client';
 const { width, height } = Dimensions.get("window");
+import Websocket from 'socket.io-client';
 import { StocksContainer } from "./trades";
 
 const FetchDetails = gql`
@@ -95,6 +95,7 @@ const StockDetails: React.FC<{ navigation: any }> = (props) => {
   // @ts-ignore
   const [logo] = useState<{ logo: React.ReactNode; color: string }>(DetailsMapper[route.params.name.toLowerCase()]);
   const [details, SetDetails] = useState<StocksContainer| null | object>(null);
+  const [socket, SetSocket] = useState<any>(null);
 
   const { loading } = useQuery(FetchDetails, {
     variables: { id: route.params.id },
@@ -108,23 +109,39 @@ const StockDetails: React.FC<{ navigation: any }> = (props) => {
     }
   });
 
-  // @ts-ignore
-  const dataSet = JSON.parse(details.DataSet);
-
-  const ConnectToSocket = (uri: string) => {
-    const io = socket(uri);
-    io.emit('join-room', route.params.id);
-  } 
-
   useEffect(() => {
     navigation.setOptions({
       headerTintColor: route.params.color,
       headerTitle: route.params.name,
       headerRight: () => logo.logo
     });
-
     ConnectToSocket('http://192.168.0.104:8000');
   }, []);
+
+  const ConnectToSocket = (uri: string) => {
+    const io = Websocket(uri);
+    io.emit('join-room', route.params.id);
+    SetSocket(io);
+  }
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("client-trade", (data: number) => {
+        console.log('client-socket', data);
+        const dummy = { ...details };
+        if (dummy.DataSet !== undefined) {
+          const dataSet_arr = JSON.parse(dummy.DataSet);
+          dataSet_arr.push(data);
+          dummy["DataSet"] = JSON.stringify(dataSet_arr);
+          SetDetails(dummy);
+        }
+      });
+
+      return () => {
+        socket.removeAllListeners();
+      };
+    }
+  });
 
   if (loading) {
     return <LoadingView/>
@@ -133,7 +150,7 @@ const StockDetails: React.FC<{ navigation: any }> = (props) => {
   return (
     <View style={Styles.MainContainer}>
       {/* // @ts-ignore */}
-      <DetailsGraph dataSet={dummy_dataSet || dataSet}/>
+      <DetailsGraph dataSet={dummy_dataSet}/>
     </View>
   );
 };

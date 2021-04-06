@@ -17,7 +17,7 @@ export interface StocksContainer {
   Volume: number;
   limit_reached?: boolean;
   CurrentTradingValue: number;
-  DataSet: Array<number>;
+  DataSet: string;
   ClickStockCard?: (name: string, color: string, id: string) => void;
 }
 
@@ -66,13 +66,8 @@ export const LoadingView = () => {
 
 const Trades = () => {
   const [request_count, SetRequestCount] = useState<number>(0);
-  const [
-    stocks_container,
-    SetStocksContainer,
-  ] = useState<Array<StocksContainer> | null>(null);
-  const [suggestion, SetSuggestion] = useState<Array<StocksContainer> | null>(
-    null
-  );
+  const [stocks_container, SetStocksContainer] = useState<Array<StocksContainer> | null>(null);
+  const [suggestion, SetSuggestion] = useState<Array<StocksContainer> | null>(null);
   const [api_limiter, SetApiLimiter] = useState<boolean>(false);
   const [search_value, SetSearchValue] = useState<string>("");
   const [refresing, SetRefresh] = useState<boolean>(false);
@@ -84,7 +79,7 @@ const Trades = () => {
   const { loading, error, refetch } = useQuery(FetchAllShares, {
     variables: { requestCount: 0 },
     onCompleted: (response) => {
-      Vibration.vibrate(25)
+      Vibration.vibrate(25);
       StockInfoHandler(response.Stocks.data);
       FetchCompleteHandler(response);
     },

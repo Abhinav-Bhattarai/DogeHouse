@@ -36,12 +36,12 @@ io.on('connection', socket => {
 
     socket.on('join-room', id => {
         socket.join(id);
-        console.log(id);
+        setInterval(() => socket.emit('client-trade', id), 10000);
     });
 
     socket.on('new-trade', (room_id, value) => {
-        socket.broadcast.to(room_id).emit(value);
-    })
+        socket.broadcast.to(room_id).emit('client-trade',value);
+    });
 });
 
 // graphQL endpoints;

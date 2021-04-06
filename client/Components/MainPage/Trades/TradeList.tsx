@@ -37,7 +37,7 @@ const SearchBar: React.FC<SearchBarProps> = (props) => {
 const TradeList: React.FC<Props> = props => {
 
     const ClickStockCardHandler = (name: string, color: string, id: string): void => {
-        props.navigation.navigation.navigate('StockDetails', { name, color, id })
+        props.navigation.navigation.navigate('StockDetails', { name, color, id });
     }
 
     const RenderItem = (stock: any) => {
