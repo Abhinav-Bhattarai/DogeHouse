@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StatusBar, StyleSheet, Dimensions, TextInput, VirtualizedList } from 'react-native';
+import { View, StatusBar, StyleSheet, Dimensions, TextInput, VirtualizedList, SafeAreaView } from 'react-native';
 import { StocksContainer } from './trades';
 import TradeCard from '../trade-card';
 import { AntDesign } from "@expo/vector-icons";
@@ -61,7 +61,7 @@ const TradeList: React.FC<Props> = props => {
     const GetItem = (data: any, index: number) => data[index];
   
     return (
-      <View style={Styles.MainContainer}>
+      <SafeAreaView style={Styles.MainContainer}>
         <StatusBar hidden />
         <View
           style={{ width: width, marginVertical: 10 }}
@@ -89,7 +89,7 @@ const TradeList: React.FC<Props> = props => {
           getItemCount={ItemCount}
           getItem={GetItem}
         />
-      </View>
+      </SafeAreaView>
     );
 };
 

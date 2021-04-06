@@ -1,13 +1,21 @@
 import { useQuery } from "@apollo/client";
 import gql from "graphql-tag";
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Dimensions, ActivityIndicator, Text } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Dimensions,
+  ActivityIndicator,
+  Text,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
 import DetailsMapper from "../../details-mapper";
 import { LineChart } from "react-native-chart-kit";
 const { width, height } = Dimensions.get("window");
-import Websocket from 'socket.io-client';
+import Websocket from "socket.io-client";
 import { StocksContainer } from "./trades";
-import { ScrollView } from "react-native-gesture-handler";
+import { ScrollView, TextInput, TouchableOpacity } from "react-native-gesture-handler";
 
 const FetchDetails = gql`
   query($id: String!) {
@@ -40,7 +48,7 @@ const LoadingView = () => {
   );
 };
 
-const Information: React.FC<{name: string, value: number}> = props => {
+const Information: React.FC<{ name: string; value: number }> = (props) => {
   const { name, value } = props;
   return (
     <View style={Styles.CardFooterContainer}>
@@ -61,11 +69,37 @@ const Information: React.FC<{name: string, value: number}> = props => {
       </View>
     </View>
   );
+};
+
+const TransactionButton: React.FC<{Click: () => void, type: string}> = props => {
+  return (
+    <TouchableOpacity onPress={props.Click}>
+      <View>
+        <Text>{ props.type }</Text>
+      </View>
+    </TouchableOpacity>
+  )
 }
 
-const dummy_dataSet = [34, 37, 39, 40, 42, 43, 42, 45, 46, 43, 44, 43, 44, 41, 41, 41, 41, 43, 42, 42, 42, 42, 43, 44, 45, 46];
+const dummy_dataSet = [34, 37, 39, 40, 42, 43, 42, 45, 46, 43, 44, 43, 44];
 
-const DetailsGraph:React.FC<{dataSet: Array<number>}> = props => {
+const InputContainer: React.FC<{
+  ChangeText: (text: string) => void;
+  placeholder: string;
+}> = (props) => {
+  return (
+    <TextInput
+      style={Styles.Input}
+      placeholder={`${props.placeholder} ....`}
+      spellCheck={false}
+      onChangeText={(text: string) => props.ChangeText(text)}
+      keyboardType="number-pad"
+      placeholderTextColor="grey"
+    />
+  );
+};
+
+const DetailsGraph: React.FC<{ dataSet: Array<number> }> = (props) => {
   return (
     <View
       style={{
@@ -84,7 +118,7 @@ const DetailsGraph:React.FC<{dataSet: Array<number>}> = props => {
           ],
         }}
         width={width - 5} // from react-native
-        height={height/ 1.94}
+        height={height / 1.94}
         yAxisLabel="$"
         yAxisInterval={1} // optional, defaults to 1
         chartConfig={{
@@ -95,7 +129,7 @@ const DetailsGraph:React.FC<{dataSet: Array<number>}> = props => {
           color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
           labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
           style: {
-            borderRadius: 5
+            borderRadius: 5,
           },
           propsForDots: {
             r: "0",
@@ -107,12 +141,12 @@ const DetailsGraph:React.FC<{dataSet: Array<number>}> = props => {
         style={{
           marginVertical: 8,
           borderRadius: 5,
-          paddingHorizontal: '5%'
+          paddingHorizontal: "5%",
         }}
       />
     </View>
   );
-}
+};
 
 const StockDetails: React.FC<{ navigation: any }> = (props) => {
   const { navigation, route } = props.navigation;
@@ -120,33 +154,35 @@ const StockDetails: React.FC<{ navigation: any }> = (props) => {
   const [logo] = useState<{ logo: React.ReactNode; color: string }>(DetailsMapper[route.params.name.toLowerCase()]);
   const [details, SetDetails] = useState<StocksContainer | null | false>(null);
   const [socket, SetSocket] = useState<any>(null);
+  const [quantity, SetQuantity] = useState<string>("");
+  const [price, SetPrice] = useState<string>("");
 
   const { loading } = useQuery(FetchDetails, {
     variables: { id: route.params.id },
     onCompleted: (response) => {
       const data = response.ShareInfo;
-      if(data !== null) {
+      if (data !== null) {
         SetDetails(data);
-      }else{
+      } else {
         SetDetails(false);
       }
-    }
+    },
   });
 
   useEffect(() => {
     navigation.setOptions({
       headerTintColor: route.params.color,
       headerTitle: route.params.name,
-      headerRight: () => logo.logo
+      headerRight: () => logo.logo,
     });
-    ConnectToSocket('http://192.168.0.104:8000');
+    ConnectToSocket("http://192.168.0.104:8000");
   }, []);
 
   const ConnectToSocket = (uri: string) => {
     const io = Websocket(uri);
-    io.emit('join-room', route.params.id);
+    io.emit("join-room", route.params.id);
     SetSocket(io);
-  }
+  };
 
   useEffect(() => {
     if (socket) {
@@ -169,26 +205,55 @@ const StockDetails: React.FC<{ navigation: any }> = (props) => {
   });
 
   if (loading || details === null) {
-    return <LoadingView/>
+    return <LoadingView />;
   }
 
   let InformationContainer = null;
   if (details !== false) {
     InformationContainer = (
       <>
-        <Information name='High' value={details.High}/>
-        <Information name='Low' value={details.Low}/>
-        <Information name='Volume' value={details.Volume}/>
-        <Information name='Last Traded Price' value={details.CurrentTradingValue}/>
+        <Information name="High" value={details.High} />
+        <Information name="Low" value={details.Low} />
+        <Information name="Volume" value={details.Volume} />
+        <Information name="Last Traded Price" value={details.CurrentTradingValue}/>
       </>
-    )
+    );
   }
 
   return (
-    <ScrollView style={Styles.MainContainer} contentContainerStyle={{alignItems: "center"}}>
-      <DetailsGraph dataSet={dummy_dataSet}/>
-      { InformationContainer }
-    </ScrollView>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      keyboardVerticalOffset={60}
+      behavior={Platform.OS === "android" ? "height" : "padding"}
+    >
+      <ScrollView
+        style={Styles.MainContainer}
+        contentContainerStyle={{ alignItems: "center" }}
+      >
+        <DetailsGraph dataSet={dummy_dataSet} />
+        {InformationContainer}
+        <Text
+          style={{
+            fontWeight: "bold",
+            color: route.params.color,
+            fontSize: 18,
+            marginVertical: 20,
+          }}
+        >
+          Trading Options
+        </Text>
+        <InputContainer
+          ChangeText={(text: string) => SetQuantity(text)}
+          placeholder="Quantity"
+        />
+        <InputContainer
+          ChangeText={(text: string) => SetPrice(text)}
+          placeholder="Price"
+        />
+        <TransactionButton type='Buy' Click={() => console.log('hello')}/>
+        <TransactionButton type='Sell' Click={() => console.log('hello')}/>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -201,7 +266,16 @@ const Styles = StyleSheet.create({
     marginVertical: 5,
     width: width,
     paddingHorizontal: "5%",
-  }
+  },
+  Input: {
+    backgroundColor: "#34363a",
+    paddingVertical: 15,
+    color: '#fff',
+    borderRadius: 10,
+    width: "95%",
+    paddingHorizontal: "5%",
+    marginVertical: 5,
+  },
 });
 
 export default StockDetails;
