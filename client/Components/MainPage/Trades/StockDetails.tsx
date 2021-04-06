@@ -1,7 +1,7 @@
 import { useQuery } from "@apollo/client";
 import gql from "graphql-tag";
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Dimensions, ActivityIndicator } from "react-native";
+import { StyleSheet, View, Dimensions, ActivityIndicator, Text } from "react-native";
 import DetailsMapper from "../../details-mapper";
 import { LineChart } from "react-native-chart-kit";
 const { width, height } = Dimensions.get("window");
@@ -39,6 +39,29 @@ const LoadingView = () => {
   );
 };
 
+const Information: React.FC<{name: string, value: number}> = props => {
+  const { name, value } = props;
+  return (
+    <View style={Styles.CardFooterContainer}>
+      <View style={{ flexDirection: "row", alignItems: "center" }}>
+        <Text style={{ fontWeight: "bold", fontSize: 14, color: "grey" }}>
+          {name} :
+        </Text>
+        <Text
+          style={{
+            fontWeight: "bold",
+            fontSize: 15,
+            color: "#90ee90",
+            marginLeft: "4%",
+          }}
+        >
+          {value}
+        </Text>
+      </View>
+    </View>
+  );
+}
+
 const dummy_dataSet = [34, 37, 39, 39, 40, 44, 45, 42, 48, 40, 45, 46, 43, 44, 41, 41, 41, 41, 43, 42, 42, 42, 42, 43, 44, 45, 46];
 
 const DetailsGraph:React.FC<{dataSet: Array<number>}> = props => {
@@ -60,7 +83,7 @@ const DetailsGraph:React.FC<{dataSet: Array<number>}> = props => {
           ],
         }}
         width={width - 5} // from react-native
-        height={340}
+        height={height/ 1.5}
         yAxisLabel="$"
         yAxisInterval={1} // optional, defaults to 1
         chartConfig={{
@@ -149,8 +172,11 @@ const StockDetails: React.FC<{ navigation: any }> = (props) => {
 
   return (
     <View style={Styles.MainContainer}>
-      {/* // @ts-ignore */}
       <DetailsGraph dataSet={dummy_dataSet}/>
+      {/* <Information name='High' value={details.High}/>
+      <Information name='Low' value={details.Low}/>
+      <Information name='Volume' value={details.Volume}/>
+      <Information name='Last Traded Price' value={details.CurrentTradingValue}/> */}
     </View>
   );
 };
@@ -161,6 +187,10 @@ const Styles = StyleSheet.create({
     backgroundColor: "#36393F",
     alignItems: "center",
   },
+  CardFooterContainer: {
+    marginVertical: 5,
+    paddingHorizontal: "5%",
+  }
 });
 
 export default StockDetails;
