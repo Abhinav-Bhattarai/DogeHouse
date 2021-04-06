@@ -7,6 +7,7 @@ import { LineChart } from "react-native-chart-kit";
 const { width, height } = Dimensions.get("window");
 import Websocket from 'socket.io-client';
 import { StocksContainer } from "./trades";
+import { ScrollView } from "react-native-gesture-handler";
 
 const FetchDetails = gql`
   query($id: String!) {
@@ -44,13 +45,13 @@ const Information: React.FC<{name: string, value: number}> = props => {
   return (
     <View style={Styles.CardFooterContainer}>
       <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <Text style={{ fontWeight: "bold", fontSize: 14, color: "grey" }}>
+        <Text style={{ fontWeight: "bold", fontSize: 17, color: "grey" }}>
           {name} :
         </Text>
         <Text
           style={{
             fontWeight: "bold",
-            fontSize: 15,
+            fontSize: 18,
             color: "#90ee90",
             marginLeft: "4%",
           }}
@@ -62,7 +63,7 @@ const Information: React.FC<{name: string, value: number}> = props => {
   );
 }
 
-const dummy_dataSet = [34, 37, 39, 39, 40, 44, 45, 42, 48, 40, 45, 46, 43, 44, 41, 41, 41, 41, 43, 42, 42, 42, 42, 43, 44, 45, 46];
+const dummy_dataSet = [34, 37, 39, 40, 42, 43, 42, 45, 46, 43, 44, 43, 44, 41, 41, 41, 41, 43, 42, 42, 42, 42, 43, 44, 45, 46];
 
 const DetailsGraph:React.FC<{dataSet: Array<number>}> = props => {
   return (
@@ -83,13 +84,13 @@ const DetailsGraph:React.FC<{dataSet: Array<number>}> = props => {
           ],
         }}
         width={width - 5} // from react-native
-        height={height/ 1.5}
+        height={height/ 1.94}
         yAxisLabel="$"
         yAxisInterval={1} // optional, defaults to 1
         chartConfig={{
-          backgroundColor: "#2F3136",
-          backgroundGradientFrom: "#2F3136",
-          backgroundGradientTo: "#2F3136",
+          backgroundColor: "#34363a",
+          backgroundGradientFrom: "#34363a",
+          backgroundGradientTo: "#34363a",
           decimalPlaces: 2,
           color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
           labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
@@ -117,7 +118,7 @@ const StockDetails: React.FC<{ navigation: any }> = (props) => {
   const { navigation, route } = props.navigation;
   // @ts-ignore
   const [logo] = useState<{ logo: React.ReactNode; color: string }>(DetailsMapper[route.params.name.toLowerCase()]);
-  const [details, SetDetails] = useState<StocksContainer| null | object>(null);
+  const [details, SetDetails] = useState<StocksContainer | null | false>(null);
   const [socket, SetSocket] = useState<any>(null);
 
   const { loading } = useQuery(FetchDetails, {
@@ -127,7 +128,7 @@ const StockDetails: React.FC<{ navigation: any }> = (props) => {
       if(data !== null) {
         SetDetails(data);
       }else{
-        SetDetails({});
+        SetDetails(false);
       }
     }
   });
@@ -150,13 +151,14 @@ const StockDetails: React.FC<{ navigation: any }> = (props) => {
   useEffect(() => {
     if (socket) {
       socket.on("client-trade", (data: number) => {
-        console.log('client-socket', data);
-        const dummy = { ...details };
-        if (dummy.DataSet !== undefined) {
-          const dataSet_arr = JSON.parse(dummy.DataSet);
-          dataSet_arr.push(data);
-          dummy["DataSet"] = JSON.stringify(dataSet_arr);
-          SetDetails(dummy);
+        if (details) {
+          const dummy = { ...details };
+          if (dummy.DataSet !== undefined) {
+            const dataSet_arr = JSON.parse(dummy.DataSet);
+            dataSet_arr.push(data);
+            dummy["DataSet"] = JSON.stringify(dataSet_arr);
+            SetDetails(dummy);
+          }
         }
       });
 
@@ -166,18 +168,27 @@ const StockDetails: React.FC<{ navigation: any }> = (props) => {
     }
   });
 
-  if (loading) {
+  if (loading || details === null) {
     return <LoadingView/>
   }
 
+  let InformationContainer = null;
+  if (details !== false) {
+    InformationContainer = (
+      <>
+        <Information name='High' value={details.High}/>
+        <Information name='Low' value={details.Low}/>
+        <Information name='Volume' value={details.Volume}/>
+        <Information name='Last Traded Price' value={details.CurrentTradingValue}/>
+      </>
+    )
+  }
+
   return (
-    <View style={Styles.MainContainer}>
+    <ScrollView style={Styles.MainContainer} contentContainerStyle={{alignItems: "center"}}>
       <DetailsGraph dataSet={dummy_dataSet}/>
-      {/* <Information name='High' value={details.High}/>
-      <Information name='Low' value={details.Low}/>
-      <Information name='Volume' value={details.Volume}/>
-      <Information name='Last Traded Price' value={details.CurrentTradingValue}/> */}
-    </View>
+      { InformationContainer }
+    </ScrollView>
   );
 };
 
@@ -185,10 +196,10 @@ const Styles = StyleSheet.create({
   MainContainer: {
     flex: 1,
     backgroundColor: "#36393F",
-    alignItems: "center",
   },
   CardFooterContainer: {
     marginVertical: 5,
+    width: width,
     paddingHorizontal: "5%",
   }
 });
