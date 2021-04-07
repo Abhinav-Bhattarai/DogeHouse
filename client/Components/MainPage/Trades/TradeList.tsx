@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, StatusBar, StyleSheet, Dimensions, TextInput, VirtualizedList, SafeAreaView } from 'react-native';
 import { StocksContainer } from './trades';
 import TradeCard from '../trade-card';
@@ -35,9 +35,17 @@ const SearchBar: React.FC<SearchBarProps> = (props) => {
 
 
 const TradeList: React.FC<Props> = props => {
+    const [joined_rooms, SetJoinedRooms] = useState<Array<string>>([])
 
     const ClickStockCardHandler = (name: string, color: string, id: string): void => {
-        props.navigation.navigation.navigate('StockDetails', { name, color, id });
+      const dummy = [...joined_rooms];
+      const filter = dummy.filter((element) => {
+        return element === id
+      });
+      const redundancy = filter.length > 0;
+      props.navigation.navigation.navigate('StockDetails', { name, color, id, redundancy});
+      dummy.push(id);
+      SetJoinedRooms(dummy);
     }
 
     const RenderItem = (stock: any) => {

@@ -9,13 +9,18 @@ import {
   Text,
   KeyboardAvoidingView,
   Platform,
+  Vibration
 } from "react-native";
 import DetailsMapper from "../../details-mapper";
 import { LineChart } from "react-native-chart-kit";
 const { width, height } = Dimensions.get("window");
 import Websocket from "socket.io-client";
 import { StocksContainer } from "./trades";
-import { ScrollView, TextInput, TouchableOpacity } from "react-native-gesture-handler";
+import {
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+} from "react-native-gesture-handler";
 
 const FetchDetails = gql`
   query($id: String!) {
@@ -71,21 +76,38 @@ const Information: React.FC<{ name: string; value: number }> = (props) => {
   );
 };
 
-const TransactionButton: React.FC<{Click: () => void, type: string}> = props => {
+const TransactionButton: React.FC<{
+  Click: () => void;
+  type: string;
+  color: string;
+}> = (props) => {
   return (
-    <TouchableOpacity onPress={props.Click}>
-      <View>
-        <Text>{ props.type }</Text>
+    <TouchableOpacity
+      style={{ width: width / 2.3, borderRadius: 5 }}
+      onPress={props.Click}
+    >
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: props.color,
+          paddingVertical: 15,
+          borderRadius: 5,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Text style={{ color: "#fff", fontWeight: "bold" }}>{props.type}</Text>
       </View>
     </TouchableOpacity>
-  )
-}
+  );
+};
 
 const dummy_dataSet = [34, 37, 39, 40, 42, 43, 42, 45, 46, 43, 44, 43, 44];
 
 const InputContainer: React.FC<{
   ChangeText: (text: string) => void;
   placeholder: string;
+  value: string;
 }> = (props) => {
   return (
     <TextInput
@@ -95,6 +117,7 @@ const InputContainer: React.FC<{
       onChangeText={(text: string) => props.ChangeText(text)}
       keyboardType="number-pad"
       placeholderTextColor="grey"
+      value={props.value}
     />
   );
 };
@@ -175,12 +198,12 @@ const StockDetails: React.FC<{ navigation: any }> = (props) => {
       headerTitle: route.params.name,
       headerRight: () => logo.logo,
     });
-    ConnectToSocket("http://192.168.0.104:8000");
+    ConnectToSocket("http://192.168.0.104:8000", route.params.redundancy);
   }, []);
 
-  const ConnectToSocket = (uri: string) => {
+  const ConnectToSocket = (uri: string, status: boolean) => {
     const io = Websocket(uri);
-    io.emit("join-room", route.params.id);
+    status === true && io.emit("join-room", route.params.id);
     SetSocket(io);
   };
 
@@ -206,19 +229,73 @@ const StockDetails: React.FC<{ navigation: any }> = (props) => {
 
   if (loading || details === null) {
     return <LoadingView />;
+  };
+
+  const TriggerSell = () => {
+    console.log('sell');
+    Vibration.vibrate(25);
+  };
+
+  const TriggerBuy = () => {
+    console.log('buy');
+    Vibration.vibrate(25);
   }
 
+  // Inner React Components;
   let InformationContainer = null;
   if (details !== false) {
-    InformationContainer = (
+    InformationContainer = () => (
       <>
         <Information name="High" value={details.High} />
         <Information name="Low" value={details.Low} />
         <Information name="Volume" value={details.Volume} />
-        <Information name="Last Traded Price" value={details.CurrentTradingValue}/>
+        <Information
+          name="Last Traded Price"
+          value={details.CurrentTradingValue}
+        />
       </>
     );
   }
+
+  const InputWrapper = () => (
+    <>
+      <Text
+        style={{
+          fontWeight: "bold",
+          color: route.params.color,
+          fontSize: 18,
+          marginVertical: 20,
+        }}
+      >
+        Trading Options
+      </Text>
+      <InputContainer
+        ChangeText={(text: string) => SetQuantity(text)}
+        placeholder="Quantity"
+        value={quantity}
+      />
+      <InputContainer
+        ChangeText={(text: string) => SetPrice(text)}
+        placeholder="Price"
+        value={price}
+      />
+    </>
+  );
+
+  const ButtonContainer = () => (
+    <View style={Styles.BtnContainer}>
+      <TransactionButton
+        color="#34A853"
+        type="Buy"
+        Click={TriggerBuy}
+      />
+      <TransactionButton
+        color="#EA4335"
+        type="Sell"
+        Click={TriggerSell}
+      />
+    </View>
+  );
 
   return (
     <KeyboardAvoidingView
@@ -231,27 +308,9 @@ const StockDetails: React.FC<{ navigation: any }> = (props) => {
         contentContainerStyle={{ alignItems: "center" }}
       >
         <DetailsGraph dataSet={dummy_dataSet} />
-        {InformationContainer}
-        <Text
-          style={{
-            fontWeight: "bold",
-            color: route.params.color,
-            fontSize: 18,
-            marginVertical: 20,
-          }}
-        >
-          Trading Options
-        </Text>
-        <InputContainer
-          ChangeText={(text: string) => SetQuantity(text)}
-          placeholder="Quantity"
-        />
-        <InputContainer
-          ChangeText={(text: string) => SetPrice(text)}
-          placeholder="Price"
-        />
-        <TransactionButton type='Buy' Click={() => console.log('hello')}/>
-        <TransactionButton type='Sell' Click={() => console.log('hello')}/>
+        {InformationContainer && <InformationContainer />}
+        {/* <InputWrapper /> */}
+        <ButtonContainer />
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -270,11 +329,20 @@ const Styles = StyleSheet.create({
   Input: {
     backgroundColor: "#34363a",
     paddingVertical: 15,
-    color: '#fff',
+    color: "#fff",
     borderRadius: 10,
     width: "95%",
     paddingHorizontal: "5%",
     marginVertical: 5,
+  },
+  BtnContainer: {
+    width: width,
+    paddingHorizontal: "4%",
+    paddingVertical: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginVertical: 20
   },
 });
 

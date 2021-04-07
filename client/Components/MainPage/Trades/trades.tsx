@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, ActivityIndicator, Vibration } from "react-native";
+import { View, ActivityIndicator } from "react-native";
 import { gql, useLazyQuery, useQuery } from "@apollo/client";
 import LoadingPage from "../../UI/LoadingPage";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -79,7 +79,6 @@ const Trades = () => {
   const { loading, error, refetch } = useQuery(FetchAllShares, {
     variables: { requestCount: 0 },
     onCompleted: (response) => {
-      Vibration.vibrate(25);
       StockInfoHandler(response.Stocks.data);
       FetchCompleteHandler(response);
     },
