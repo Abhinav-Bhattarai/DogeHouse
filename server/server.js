@@ -31,7 +31,7 @@ app.use(sanitizer());
 // socket connection;
 io.on('connection', socket => {
     socket.on('disconnect', () => {
-        console.log('user Disconnected');
+        // console.log('user Disconnected');
     });
 
     socket.on('join-room', id => {
