@@ -51,6 +51,21 @@ export const Information: React.FC<{ name: string; value: number }> = (
   );
 };
 
+export const ModalHeader: React.FC<{ value: string }> = (props) => {
+  return (
+    <View
+      style={{
+        width: width,
+        paddingVertical: 15,
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <Text style={{ fontWeight: "bold", fontSize: 20, color: 'grey' }}>{props.value}</Text>
+    </View>
+  );
+};
+
 export const TransactionButton: React.FC<{
   Click: () => void;
   type: string;
@@ -160,6 +175,6 @@ const Styles = StyleSheet.create({
     borderRadius: 10,
     width: "95%",
     paddingHorizontal: "5%",
-    marginVertical: 5,
+    marginVertical: 5,  
   },
 });

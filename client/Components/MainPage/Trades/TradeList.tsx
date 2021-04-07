@@ -35,17 +35,17 @@ const SearchBar: React.FC<SearchBarProps> = (props) => {
 
 
 const TradeList: React.FC<Props> = props => {
-    const [joined_rooms, SetJoinedRooms] = useState<Array<string>>([])
+    // const [joined_rooms, SetJoinedRooms] = useState<Array<string>>([])
 
     const ClickStockCardHandler = (name: string, color: string, id: string): void => {
-      const dummy = [...joined_rooms];
-      const filter = dummy.filter((element) => {
-        return element === id
-      });
-      const redundancy = filter.length > 0;
-      props.navigation.navigation.navigate('StockDetails', { name, color, id, redundancy});
-      dummy.push(id);
-      SetJoinedRooms(dummy);
+      // const dummy = [...joined_rooms];
+      // const filter = dummy.filter((element) => {
+      //   return element === id
+      // });
+      // const redundancy = filter.length > 0;
+      // dummy.push(id);
+      // SetJoinedRooms(dummy);
+      props.navigation.navigation.navigate('StockDetails', { name, color, id});
     }
 
     const RenderItem = (stock: any) => {
