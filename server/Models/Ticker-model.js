@@ -39,6 +39,16 @@ const Schema = new mongoose.Schema({
     DataSet: {
         type: String,
         default: "[10]"
+    },
+
+    BuyerQueue: {
+        type: [{buyer: String, price: Number, quantity: Number}],
+        default: []
+    },
+
+    SellerQueue: {
+        type: [{seller: String, price: Number, quantity: Number}],
+        default: []
     }
 });
 

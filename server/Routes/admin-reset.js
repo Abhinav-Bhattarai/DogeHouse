@@ -11,6 +11,8 @@ const ModifyData = data => {
         ticker.Low = dummy.CurrentTradingValue - dummy.CurrentTradingValue * 0.1;
         ticker.DataSet = [dummy.CurrentTradingValue];
         ticker.Volume = 0;
+        ticker.SellerQueue = [];
+        ticker.BuyerQueue = [];
         newData.push(ticker);
     });
     return newData;

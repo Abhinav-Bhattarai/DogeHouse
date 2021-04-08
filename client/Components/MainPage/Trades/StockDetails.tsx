@@ -11,6 +11,7 @@ import {
   Vibration,
   ScrollView,
   Modal,
+  TouchableOpacity
 } from "react-native";
 import DetailsMapper from "../../details-mapper";
 import {
@@ -25,7 +26,6 @@ import {
 const { width } = Dimensions.get("window");
 import Websocket from "socket.io-client";
 import { StocksContainer } from "./trades";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import axios from "axios";
 
 const FetchDetails = gql`
