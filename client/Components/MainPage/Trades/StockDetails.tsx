@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client";
 import gql from "graphql-tag";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   StyleSheet,
   View,
@@ -27,6 +27,7 @@ const { width } = Dimensions.get("window");
 import Websocket from "socket.io-client";
 import { StocksContainer } from "./trades";
 import axios from "axios";
+import Context from "../../../Containers/Context";
 
 const FetchDetails = gql`
   query($id: String!) {
@@ -102,6 +103,7 @@ const StockDetails: React.FC<{ navigation: any }> = (props) => {
   const [modal_popup, SetModalPopup] = useState<boolean>(false);
   const [quantity, SetQuantity] = useState<string>("");
   const [price, SetPrice] = useState<string>("");
+  const UserContext = useContext(Context);
 
   const { loading } = useQuery(FetchDetails, {
     variables: { id: route.params.id },
@@ -123,6 +125,14 @@ const StockDetails: React.FC<{ navigation: any }> = (props) => {
     });
     ConnectToSocket("http://192.168.0.104:8000");
   }, []);
+
+  // useEffect(() => {
+  //   const start = performance.now();
+  //   for (let i = 0; i < 100000; i++) {
+  //     console.log(i);
+  //   };
+  //   console.log(performance.now() - start);
+  // }, []);
 
   const ConnectToSocket = (uri: string) => {
     const io = Websocket(uri);
@@ -152,16 +162,28 @@ const StockDetails: React.FC<{ navigation: any }> = (props) => {
 
   if (loading || details === null) {
     return <LoadingView />;
-  }
+  };
 
   const TriggerSell = () => {
     console.log('sell');
-    // axios.post('http://192.168.0.104:8000/sell', {});
+    const context = {
+      quantity,
+      stockID: route.params.id,
+      userID: UserContext.userID,
+      price
+    }
+    axios.post('http://192.168.0.104:8000/transaction/sell', context);
   };
 
   const TriggerBuy = () => {
     console.log('buy')
-    // axios.post('http://192.168.0.104:8000/buy', {});
+    const context = {
+      quantity,
+      stockID: route.params.id,
+      userID: UserContext.userID,
+      price
+    }
+    axios.post('http://192.168.0.104:8000/transaction/buy', context);
   };
 
   const TriggerModal = () => {

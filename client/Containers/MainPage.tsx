@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
+import { StatusBar } from 'react-native';
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { useQuery, gql } from "@apollo/client";
 import Context from "./Context";
@@ -132,11 +133,14 @@ const MainPage: React.FC<PROPS> = (props) => {
   };
 
   return (
-    <ContextComponent>
-      <NavigationContainer>
-        <NavigationComponent />
-      </NavigationContainer>
-    </ContextComponent>
+    <>
+      <StatusBar hidden />
+      <ContextComponent>
+        <NavigationContainer>
+          <NavigationComponent />
+        </NavigationContainer>
+      </ContextComponent>
+    </>
   );
 };
 

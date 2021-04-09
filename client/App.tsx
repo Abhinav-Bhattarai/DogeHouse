@@ -60,7 +60,7 @@ function App() {
 
     CheckAuthentication();
   }, []);
-
+  
   return (
     <>
       {auth_status === null || user_info === undefined ? (

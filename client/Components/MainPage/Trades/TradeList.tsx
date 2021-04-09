@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, StatusBar, StyleSheet, Dimensions, TextInput, VirtualizedList, SafeAreaView } from 'react-native';
+import React from 'react';
+import { View, StyleSheet, Dimensions, TextInput, VirtualizedList } from 'react-native';
 import { StocksContainer } from './trades';
 import TradeCard from '../trade-card';
 import { AntDesign } from "@expo/vector-icons";
@@ -35,16 +35,8 @@ const SearchBar: React.FC<SearchBarProps> = (props) => {
 
 
 const TradeList: React.FC<Props> = props => {
-    // const [joined_rooms, SetJoinedRooms] = useState<Array<string>>([])
 
     const ClickStockCardHandler = (name: string, color: string, id: string): void => {
-      // const dummy = [...joined_rooms];
-      // const filter = dummy.filter((element) => {
-      //   return element === id
-      // });
-      // const redundancy = filter.length > 0;
-      // dummy.push(id);
-      // SetJoinedRooms(dummy);
       props.navigation.navigation.navigate('StockDetails', { name, color, id});
     }
 
@@ -69,8 +61,7 @@ const TradeList: React.FC<Props> = props => {
     const GetItem = (data: any, index: number) => data[index];
   
     return (
-      <SafeAreaView style={Styles.MainContainer}>
-        <StatusBar hidden />
+      <View style={Styles.MainContainer}>
         <View
           style={{ width: width, marginVertical: 10 }}
         >
@@ -97,7 +88,7 @@ const TradeList: React.FC<Props> = props => {
           getItemCount={ItemCount}
           getItem={GetItem}
         />
-      </SafeAreaView>
+      </View>
     );
 };
 
