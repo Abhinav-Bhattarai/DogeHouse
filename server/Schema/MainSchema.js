@@ -96,6 +96,7 @@ const RootQuery = new GraphQLObjectType({
           .skip(request_count * 10)
           .limit(10);
         if (response.length !== 0) {
+          console.log(true, 'server responded');
           if (response.length === 10) {
             return { data: response, limit_reached: false };
           }

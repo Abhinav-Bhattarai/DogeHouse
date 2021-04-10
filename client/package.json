@@ -10,6 +10,7 @@
   "dependencies": {
     "@apollo/client": "^3.3.12",
     "@react-native-community/async-storage": "^1.12.1",
+    "@react-native-community/netinfo": "5.9.7",
     "@react-navigation/drawer": "^5.12.4",
     "@react-navigation/material-bottom-tabs": "^5.3.14",
     "@react-navigation/material-top-tabs": "^5.3.14",

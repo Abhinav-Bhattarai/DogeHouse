@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { View, ActivityIndicator } from "react-native";
+import AsyncStorage from '@react-native-community/async-storage';
+import { View, ActivityIndicator, Alert } from "react-native";
 import { gql, useLazyQuery, useQuery } from "@apollo/client";
 import LoadingPage from "../../UI/LoadingPage";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -75,6 +76,7 @@ const Trades = () => {
     onCompleted: (response) => {
       FetchCompleteHandler(response);
     },
+    fetchPolicy: 'cache-and-network'
   });
   const { loading, error, refetch } = useQuery(FetchAllShares, {
     variables: { requestCount: 0 },
@@ -82,11 +84,25 @@ const Trades = () => {
       StockInfoHandler(response.Stocks.data);
       FetchCompleteHandler(response);
     },
+    fetchPolicy: 'cache-and-network',
+    onError: err => {
+      Alert.alert('No Network Connectivity', 'Network is not found. Check the internet connectivity and try again', [
+        {
+          text: 'Refetch',
+          onPress: () => refetch()
+        },
+        {
+          text: 'Cancel',
+        }
+      ])
+    }
   });
 
-  const FetchCompleteHandler = (response: any) => {
+  const FetchCompleteHandler = async(response: any) => {
     if (response.Stocks !== null) {
       const { data, limit_reached } = response.Stocks;
+      const AsyncCheck = await AsyncStorage.getItem('Stocks-Data');
+      (AsyncCheck === null) && AsyncStorage.setItem('Stocks-data', JSON.stringify(data));
       SetStocksContainer(data);
       limit_reached && SetApiLimiter(true);
       SetRequestCount(request_count + 1);
@@ -100,6 +116,7 @@ const Trades = () => {
   };
 
   const ChangeText = (text: string): void => {
+    refetch();
     const regex = new RegExp(`^${text}`, "gi");
     if (stocks_container !== null) {
       const dummy = [...stocks_container];
@@ -114,10 +131,8 @@ const Trades = () => {
   };
 
   const RefreshHandler = () => {
-    refetch();
     SetRefresh(true);
-    request_count > 0 && SetRequestCount(0);
-    api_limiter === true && SetApiLimiter(false);
+    refetch();
   };
 
   if (loading || stocks_container === null) {
