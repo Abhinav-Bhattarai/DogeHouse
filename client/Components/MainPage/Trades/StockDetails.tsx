@@ -126,14 +126,6 @@ const StockDetails: React.FC<{ navigation: any }> = (props) => {
     ConnectToSocket("http://192.168.0.104:8000");
   }, []);
 
-  // useEffect(() => {
-  //   const start = performance.now();
-  //   for (let i = 0; i < 100000; i++) {
-  //     console.log(i);
-  //   };
-  //   console.log(performance.now() - start);
-  // }, []);
-
   const ConnectToSocket = (uri: string) => {
     const io = Websocket(uri);
     io.emit("join-room", route.params.id);
@@ -165,18 +157,17 @@ const StockDetails: React.FC<{ navigation: any }> = (props) => {
   };
 
   const TriggerSell = () => {
-    console.log('sell');
     const context = {
       quantity,
       stockID: route.params.id,
       userID: UserContext.userID,
-      price
+      price,
+      name: route.params.name
     }
     axios.post('http://192.168.0.104:8000/transaction/sell', context);
   };
 
   const TriggerBuy = () => {
-    console.log('buy')
     const context = {
       quantity,
       stockID: route.params.id,

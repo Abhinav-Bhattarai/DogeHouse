@@ -58,6 +58,13 @@ function App() {
       }
     };
 
+    const TestAsync = async (cb: (data: any) => void) => {
+      const response = 'hello'
+      return cb(response);
+    }
+    TestAsync((data: any) => {
+      console.log(data);
+    })
     CheckAuthentication();
   }, []);
   

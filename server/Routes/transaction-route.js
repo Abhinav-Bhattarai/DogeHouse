@@ -18,10 +18,10 @@ const SellerPortfolioManagement = async(userID, stockID) => {
   return {seller_portfolio_updated: true};
 }
 
-const BuyerPortfolioManagement = async(userID, stockID, quantity) => {
+const BuyerPortfolioManagement = async(userID, stockID, quantity, name) => {
   const response = await PortfolioModel.findOne({userID});
   const dummy = [...response.Portfolio];
-  dummy.push({stockID, name: '', Quantity: quantity})
+  dummy.push({stockID, name, Quantity: quantity})
   response.Portfolio = dummy;
   await response.save();
   return {buyer_portfolio_updated: true};
@@ -46,7 +46,7 @@ const CheckStocksQueue = async (type, id, quantity, price) => {
   return {QueueMatch, StocksData, dummy_data, MatchInfo};
 };
 
-const BuyStocks = async ({ quantity, userID, stockID, price }) => {
+const BuyStocks = async ({ quantity, userID, stockID, price, name }) => {
   const { QueueMatch, StocksData, dummy_data, MatchInfo } = await CheckStocksQueue("buy", stockID, quantity, price);
   if (QueueMatch === true) {
     const dummy = [...StocksData];
@@ -59,12 +59,12 @@ const BuyStocks = async ({ quantity, userID, stockID, price }) => {
     await StocksData.save();
     // Remove that stock from Seller's Portfolio
     await SellerPortfolioManagement(MatchInfo.seller, stockID);
-    await BuyerPortfolioManagement(userID, stockID, quantity);
+    await BuyerPortfolioManagement(userID, stockID, quantity, name);
     return { stocks_bought: true };
   }
 };
 
-const SellStocks = async ({ quantity, userID, stockID, price }) => {
+const SellStocks = async ({ quantity, userID, stockID, price, name }) => {
   const { QueueMatch, StocksData, dummy_data } = await CheckStocksQueue("sell", stockID, quantity, price);
   if (QueueMatch === true) {
     const dummy = [...StocksData];
