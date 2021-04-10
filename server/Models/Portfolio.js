@@ -7,7 +7,7 @@ const Schema = new mongoose.Schema({
     },
 
     Portfolio: {
-        type: [{stockID: String, Quantity: Number}],
+        type: [{stockID: String, name: String, Quantity: Number}],
         default: []
     }
 });
