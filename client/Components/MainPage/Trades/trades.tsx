@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import AsyncStorage from '@react-native-community/async-storage';
 import { View, ActivityIndicator, Alert } from "react-native";
-import { gql, useLazyQuery, useQuery } from "@apollo/client";
+import { gql, useLazyQuery, useQuery, NetworkStatus } from "@apollo/client";
 import LoadingPage from "../../UI/LoadingPage";
 import { createStackNavigator } from "@react-navigation/stack";
 import TradeList from "./TradeList";
@@ -20,7 +20,7 @@ export interface StocksContainer {
   CurrentTradingValue: number;
   DataSet: string;
   ClickStockCard?: (name: string, color: string, id: string) => void;
-}
+};
 
 // ApolloClient gql request;
 
@@ -78,7 +78,7 @@ const Trades = () => {
     },
     fetchPolicy: 'cache-and-network'
   });
-  const { loading, error, refetch } = useQuery(FetchAllShares, {
+  const { loading, error, refetch, networkStatus } = useQuery(FetchAllShares, {
     variables: { requestCount: 0 },
     onCompleted: (response) => {
       StockInfoHandler(response.Stocks.data);
@@ -97,17 +97,18 @@ const Trades = () => {
       ])
     }
   });
+  console.log('Trades-rendered');
 
   const FetchCompleteHandler = async(response: any) => {
     if (response.Stocks !== null) {
       const { data, limit_reached } = response.Stocks;
-      const AsyncCheck = await AsyncStorage.getItem('Stocks-Data');
+      const AsyncCheck = await AsyncStorage.getItem('Stocks-data');
       (AsyncCheck === null) && AsyncStorage.setItem('Stocks-data', JSON.stringify(data));
       SetStocksContainer(data);
+      refresing && SetRefresh(false);
       limit_reached && SetApiLimiter(true);
       SetRequestCount(request_count + 1);
     }
-    refresing && SetRefresh(false);
   };
 
   const CallGQL = () => {
@@ -116,7 +117,6 @@ const Trades = () => {
   };
 
   const ChangeText = (text: string): void => {
-    refetch();
     const regex = new RegExp(`^${text}`, "gi");
     if (stocks_container !== null) {
       const dummy = [...stocks_container];

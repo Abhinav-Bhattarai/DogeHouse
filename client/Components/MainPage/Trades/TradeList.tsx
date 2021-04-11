@@ -21,7 +21,7 @@ interface SearchBarProps {
     Change: (text: string) => void;
 };
 
-const SearchBar: React.FC<SearchBarProps> = (props) => {
+export const SearchBar: React.FC<SearchBarProps> = (props) => {
     return (
       <TextInput
         placeholder="Search stocks here...."
@@ -32,7 +32,6 @@ const SearchBar: React.FC<SearchBarProps> = (props) => {
       />
     );
 };
-
 
 const TradeList: React.FC<Props> = props => {
 

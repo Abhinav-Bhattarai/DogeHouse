@@ -10,6 +10,7 @@ import Profile from "../Components/MainPage/Profile/profile";
 import Trades from "../Components/MainPage/Trades/trades";
 import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
 import Settings from '../Components/MainPage/Settings/settings';
+import CachedTrade from "../Components/MainPage/NetworkCaches/cached-trade";
 const Tabs = createMaterialTopTabNavigator();
 
 const UserInfo = gql`
@@ -22,6 +23,7 @@ const UserInfo = gql`
 
 interface PROPS {
   userInfo: { userID: string; token: string; Username: string };
+  internet_connectivity: boolean;
 }
 
 const MainPage: React.FC<PROPS> = (props) => {
@@ -40,7 +42,8 @@ const MainPage: React.FC<PROPS> = (props) => {
 
   if (error) {
     return <LoadingPage />;
-  }
+  };
+  console.log('MainPage.tsx rendered');
 
   const NavigationComponent = () => {
     return (
@@ -87,7 +90,12 @@ const MainPage: React.FC<PROPS> = (props) => {
             ),
           }}
         >
-          {() => <Trades />}
+          {() => {
+            if (props.internet_connectivity) {
+              return <Trades/>
+            }
+            return <CachedTrade/>
+          }}
         </Tabs.Screen>
 
         <Tabs.Screen
@@ -144,5 +152,5 @@ const MainPage: React.FC<PROPS> = (props) => {
   );
 };
 
-export default MainPage;
+export default React.memo(MainPage);
  

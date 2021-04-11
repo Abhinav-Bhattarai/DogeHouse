@@ -126,7 +126,11 @@ const TradeCard: React.FC<StocksContainer> = (props) => {
   return (
     <TouchableOpacity
       // @ts-ignore 
-      onPress={() => props.ClickStockCard(props.Name, StockPick.color, props._id)}
+      onPress={() => {
+        if (props.ClickStockCard) {
+          props.ClickStockCard(props.Name, StockPick.color, props._id)
+        }
+      }}
       style={Styles.MainContainer}
       activeOpacity={0.9}
     >

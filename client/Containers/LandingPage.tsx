@@ -62,6 +62,8 @@ const LandingPage: React.FC<PROPS> = ({ ChangeAuthentication }) => {
     }
   };
 
+  console.log('LandingPage rendered')
+
   const SignupHandler = async (): Promise<void> => {
     if (
       password_signup === confirm_signup &&
