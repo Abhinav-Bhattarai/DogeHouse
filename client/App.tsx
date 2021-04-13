@@ -39,7 +39,6 @@ function App() {
   const [user_info, SetUserInfo] = useState<object | null>(null);
   const [internet_connectivity, SetInternetConnectivity] = useState<boolean | null>(null);
 
-  console.log('App.tsx rendered');
 
   useEffect(() => {
     const CheckAuthentication = async () => {
@@ -47,11 +46,10 @@ function App() {
       const Token = await AsyncStorage.getItem("auth-token");
       const Username = await AsyncStorage.getItem("Username");
       const UserID = await AsyncStorage.getItem("UserID");
-      // console.log(NetworkStatus.details.ssid);
       if (Token && Username && UserID) {
         const NetworkStatus = await NetInfo.fetch();
         // @ts-ignore
-        if (NetworkStatus.details.ssid === 'ABHINAV') {
+        if (NetworkStatus.isInternetReachable === false) {
           SetAuthStatus(true);
           SetUserInfo({ token: Token, Username, userID: UserID });
           SetInternetConnectivity(false);

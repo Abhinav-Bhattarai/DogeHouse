@@ -97,7 +97,6 @@ const Trades = () => {
       ])
     }
   });
-  console.log('Trades-rendered');
 
   const FetchCompleteHandler = async(response: any) => {
     if (response.Stocks !== null) {

@@ -37,7 +37,7 @@ io.on('connection', socket => {
 
     socket.on('join-room', id => {
         socket.join(id);
-        setInterval(() => socket.emit('client-trade', id), 60000);
+        // setInterval(() => socket.emit('client-trade', id), 60000);
     });
 
     socket.on('new-trade', (room_id, value) => {

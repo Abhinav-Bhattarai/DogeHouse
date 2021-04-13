@@ -43,7 +43,6 @@ const MainPage: React.FC<PROPS> = (props) => {
   if (error) {
     return <LoadingPage />;
   };
-  console.log('MainPage.tsx rendered');
 
   const NavigationComponent = () => {
     return (
